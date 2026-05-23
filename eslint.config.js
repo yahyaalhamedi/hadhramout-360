@@ -27,7 +27,7 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
       'react/jsx-uses-vars': 'error',
-      'no-unused-vars': 'error',
+      'no-unused-vars': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
         { vars: 'all', args: 'after-used', ignoreRestSiblings: false },
