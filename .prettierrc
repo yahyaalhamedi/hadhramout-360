@@ -7,6 +7,5 @@
   "trailingComma": "all",
   "bracketSameLine": false,
   "bracketSpacing": true,
-  "parser": "typescript",
   "singleAttributePerLine": true
 }
