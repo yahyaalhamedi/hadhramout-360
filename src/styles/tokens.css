@@ -1,0 +1,117 @@
+/**
+ * Hadhramout 360 design tokens
+ * Scales: lightest (0) → darkest (n). Semantic aliases map into shadcn variables.
+ */
+
+:root {
+  /* Primary — teal */
+  --primary-0: #ffffff;
+  --primary-1: #b1fffb;
+  --primary-2: #a3f0ed;
+  --primary-3: #87d4d1;
+  --primary-4: #6bb8b5;
+  --primary-5: #509d9a;
+  --primary-6: #338380;
+  --primary-7: #096866;
+  --primary-8: #00504e;
+  --primary-9: #003736;
+  --primary-10: #00201f;
+  --primary-11: #000000;
+
+  /* Secondary — gold */
+  --secondary-0: #ffffff;
+  --secondary-1: #ffeedc;
+  --secondary-2: #ffddb4;
+  --secondary-3: #ebbf85;
+  --secondary-4: #d2a870;
+  --secondary-5: #cea46c;
+  --secondary-6: #b18a55;
+  --secondary-7: #95713e;
+  --secondary-8: #795828;
+  --secondary-9: #5f4112;
+  --secondary-10: #452b00;
+  --secondary-11: #291800;
+  --secondary-12: #000000;
+
+  /* Tertiary — slate */
+  --tertiary-0: #f6f7f9;
+  --tertiary-1: #eceef2;
+  --tertiary-2: #d4dae3;
+  --tertiary-3: #aebacb;
+  --tertiary-4: #8294ae;
+  --tertiary-5: #627795;
+  --tertiary-6: #4e607b;
+  --tertiary-7: #404d64;
+  --tertiary-8: #384354;
+  --tertiary-9: #323a48;
+  --tertiary-10: #282e3a;
+
+  /* Semantic (shadcn) — light */
+  --background: var(--tertiary-0);
+  --foreground: var(--tertiary-10);
+  --card: var(--primary-0);
+  --card-foreground: var(--tertiary-10);
+  --popover: var(--primary-0);
+  --popover-foreground: var(--tertiary-10);
+  --primary: var(--primary-7);
+  --primary-foreground: var(--primary-0);
+  --secondary: var(--secondary-2);
+  --secondary-foreground: var(--secondary-10);
+  --muted: var(--tertiary-1);
+  --muted-foreground: var(--tertiary-6);
+  --accent: var(--primary-1);
+  --accent-foreground: var(--primary-9);
+  --destructive: #dc2626;
+  --destructive-foreground: var(--primary-0);
+  --border: var(--tertiary-2);
+  --input: var(--tertiary-2);
+  --ring: var(--primary-6);
+  --chart-1: var(--primary-5);
+  --chart-2: var(--primary-7);
+  --chart-3: var(--secondary-6);
+  --chart-4: var(--secondary-8);
+  --chart-5: var(--tertiary-6);
+  --sidebar: var(--primary-0);
+  --sidebar-foreground: var(--tertiary-10);
+  --sidebar-primary: var(--primary-7);
+  --sidebar-primary-foreground: var(--primary-0);
+  --sidebar-accent: var(--tertiary-1);
+  --sidebar-accent-foreground: var(--tertiary-10);
+  --sidebar-border: var(--tertiary-2);
+  --sidebar-ring: var(--primary-6);
+}
+
+.dark {
+  --background: var(--primary-10);
+  --foreground: var(--tertiary-0);
+  --card: var(--primary-9);
+  --card-foreground: var(--tertiary-0);
+  --popover: var(--primary-9);
+  --popover-foreground: var(--tertiary-0);
+  --primary: var(--primary-4);
+  --primary-foreground: var(--primary-10);
+  --secondary: var(--secondary-8);
+  --secondary-foreground: var(--secondary-1);
+  --muted: var(--primary-9);
+  --muted-foreground: var(--tertiary-4);
+  --accent: var(--primary-8);
+  --accent-foreground: var(--primary-1);
+  --destructive: #f87171;
+  --destructive-foreground: var(--primary-10);
+  --border: color-mix(in srgb, var(--tertiary-0) 12%, transparent);
+  --input: color-mix(in srgb, var(--tertiary-0) 15%, transparent);
+  --ring: var(--primary-5);
+  --chart-1: var(--primary-3);
+  --chart-2: var(--primary-5);
+  --chart-3: var(--secondary-4);
+  --chart-4: var(--secondary-6);
+  --chart-5: var(--tertiary-4);
+  --sidebar: var(--primary-9);
+  --sidebar-foreground: var(--tertiary-0);
+  --sidebar-primary: var(--primary-4);
+  --sidebar-primary-foreground: var(--primary-10);
+  --sidebar-accent: var(--primary-8);
+  --sidebar-accent-foreground: var(--tertiary-0);
+  --sidebar-border: color-mix(in srgb, var(--tertiary-0) 12%, transparent);
+  --sidebar-ring: var(--primary-5);
+}
