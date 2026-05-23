@@ -65,7 +65,7 @@ export function NavigationMenuDemo() {
 
   return (
     <NavigationMenu dir={isRtl ? 'rtl' : 'ltr'}>
-      <NavigationMenuList className="flex w-screen items-center justify-between gap-4 p-10">
+      <NavigationMenuList className="flex w-screen items-center justify-between gap-4 px-10 py-5">
         <NavigationMenuItem>
           <NavLink to="/">
             <img
@@ -76,7 +76,7 @@ export function NavigationMenuDemo() {
           </NavLink>
         </NavigationMenuItem>
 
-        <NavigationMenuItem className="flex items-center gap-1">
+        <NavigationMenuItem className="flex items-center gap-5">
           {content.map((item) => (
             <NavMenuItem
               key={item.href}
