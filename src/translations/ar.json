@@ -6,5 +6,13 @@
   "discover": "الاكتشاف",
   "community": "المجتمع",
   "label.view_details": "مشاهدة التفاصيل",
-  "label.view_all": "عرض الكل"
+  "label.view_all": "عرض الكل",
+  "search.placeholder": "ابحث بالاسم أو الكلمة المفتاحية...",
+  "label.active_filters": "الفلاتر النشطة:",
+  "label.clear_filters": "مسح الفلاتر",
+  "label.category": "التصنيف",
+  "label.historical": "تاريخي",
+  "label.cultural": "ثقافي",
+  "label.natural": "طبيعي",
+  "label.modern": "حديث"
 }

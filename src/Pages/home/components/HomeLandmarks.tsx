@@ -1,43 +1,17 @@
 import SharedCard from '@/components/atoms/SharedCard'
 import { useGetRtl } from '@/lib/utils'
+import { LANDMARKS_DATA } from '@/Pages/landmarks/data'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 const HomeLandmarks = () => {
   const { i18n } = useTranslation()
+  const navigate = useNavigate()
   const isRtl = useGetRtl()
 
-  const [cards, setCards] = useState([
-    {
-      id: 1,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      location: 'Shibam, Hadhramout',
-      title: 'The Manhattan of the Desert',
-      isFavorite: false,
-    },
-    {
-      id: 2,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      location: 'Shibam, Hadhramout',
-      title: 'The Manhattan of the Desert',
-      isFavorite: false,
-    },
-    {
-      id: 3,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      location: 'Shibam, Hadhramout',
-      title: 'The Manhattan of the Desert',
-      isFavorite: false,
-    },
-    {
-      id: 4,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      location: 'Shibam, Hadhramout',
-      title: 'The Manhattan of the Desert',
-      isFavorite: false,
-    },
-  ])
+  const [cards, setCards] = useState(LANDMARKS_DATA)
 
   const toggleFavorite = (id: number) => {
     setCards((prevCards) =>
@@ -79,8 +53,11 @@ const HomeLandmarks = () => {
                 location={card.location}
                 title={card.title}
                 isFavorite={card.isFavorite}
-                onClick={() => console.log(card.title)}
+                onClick={() =>
+                  navigate(`/landmarks/${card.slug}`, { state: { from: '/', label: 'Home' } })
+                }
                 onFavoriteClick={() => toggleFavorite(card.id)}
+                className="h-[400px] w-fit"
               />
             </div>
           )

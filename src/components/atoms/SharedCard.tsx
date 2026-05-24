@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 interface SharedCardProps {
   imageUrl: string
+  className?: string
   location: string
   title: string
   onClick: () => void
@@ -14,6 +15,7 @@ interface SharedCardProps {
 
 export default function SharedCard({
   imageUrl,
+  className,
   location,
   title,
   onClick,
@@ -24,7 +26,7 @@ export default function SharedCard({
   const isRtl = useGetRtl()
 
   return (
-    <div className="group relative h-[400px] w-fit overflow-hidden rounded-[32px]">
+    <div className={`group relative overflow-hidden rounded-[32px] ${className}`}>
       {/* Background Image */}
       <img
         src={imageUrl}
@@ -36,7 +38,7 @@ export default function SharedCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-8 flex">
+      <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between">
         <div>
           {/* Location */}
           <div className="mb-3 flex items-center gap-2 text-sm text-white/90">

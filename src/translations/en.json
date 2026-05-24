@@ -6,5 +6,13 @@
   "discover": "Discover",
   "community": "Community",
   "label.view_details": "View Details",
-  "label.view_all": "View all"
+  "label.view_all": "View all",
+  "search.placeholder": "Search by name or keyword...",
+  "label.active_filters": "Active Filters:",
+  "label.clear_filters": "Clear Filters",
+  "label.category": "Category",
+  "label.historical": "Historical",
+  "label.cultural": "Cultural",
+  "label.natural": "Natural",
+  "label.modern": "Modern"
 }

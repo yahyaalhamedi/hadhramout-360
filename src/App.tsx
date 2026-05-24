@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/atoms/Navbar'
 import Home from './Pages/home/Home'
 import Footer from './components/atoms/Footer'
+import Landmarks from './Pages/landmarks/Landmarks'
+import LandmarkDetail from './Pages/landmarks/LandmarkDetail'
 
 function App() {
   return (
@@ -15,7 +17,11 @@ function App() {
         />
         <Route
           path="/landmarks"
-          element={<div>Landmarks</div>}
+          element={<Landmarks />}
+        />
+        <Route
+          path="/landmarks/:slug"
+          element={<LandmarkDetail />}
         />
         <Route
           path="/events"
