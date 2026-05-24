@@ -23,12 +23,12 @@ const content: { title: string; href: string }[] = [
   { title: 'community', href: '/community' },
 ]
 
-function isNavActive(pathname: string, href: string) {
+const isNavActive = (pathname: string, href: string) => {
   if (href === '/') return pathname === '/'
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function NavMenuItem({ title, href }: { title: string; href: string }) {
+const NavMenuItem = ({ title, href }: { title: string; href: string }) => {
   const { pathname } = useLocation()
   const active = isNavActive(pathname, href)
 
@@ -52,7 +52,7 @@ function NavMenuItem({ title, href }: { title: string; href: string }) {
   )
 }
 
-export function NavigationMenuDemo() {
+const Navbar = () => {
   const { t, i18n } = useTranslation()
   const isRtl = useGetRtl()
   const logo = isRtl ? hadhramoutAR : hadhramoutEN
@@ -106,3 +106,5 @@ export function NavigationMenuDemo() {
     </NavigationMenu>
   )
 }
+
+export default Navbar

@@ -1,11 +1,10 @@
-import { CarouselPlugin } from '@/components/atoms/Carousel'
 import SharedCard from '@/components/atoms/SharedCard'
 import { useGetRtl } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const Home = () => {
+const HomeLandmarks = () => {
   const { i18n } = useTranslation()
   const isRtl = useGetRtl()
 
@@ -54,45 +53,41 @@ const Home = () => {
   }
 
   return (
-    <main className="flex flex-col gap-8 bg-white">
-      <CarouselPlugin />
+    <div>
+      <div className="flex justify-between items-center">
+        <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold text-primary">
+          {i18n.t('landmarks')}
+        </h1>
+        <p
+          className="scroll-m-20 font-heading text-secondary-5 cursor-pointer flex items-center"
+          onClick={() => console.log('clicked')}
+        >
+          {i18n.t('label.view_all')}
+          {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+        </p>
+      </div>
 
-      <section className="px-10">
-        <div className="flex justify-between items-center">
-          <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold text-primary">
-            {i18n.t('landmarks')}
-          </h1>
-          <p
-            className="scroll-m-20 font-heading text-secondary-5 cursor-pointer flex items-center"
-            onClick={() => console.log('clicked')}
-          >
-            {i18n.t('label.view_all')}
-            {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-          </p>
-        </div>
-
-        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-          {cards.map((card) => {
-            return (
-              <div
-                key={card.id}
-                className="min-w-[380px] shrink-0"
-              >
-                <SharedCard
-                  imageUrl={card.imageUrl}
-                  location={card.location}
-                  title={card.title}
-                  isFavorite={card.isFavorite}
-                  onClick={() => console.log(card.title)}
-                  onFavoriteClick={() => toggleFavorite(card.id)}
-                />
-              </div>
-            )
-          })}
-        </div>
-      </section>
-    </main>
+      <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        {cards.map((card) => {
+          return (
+            <div
+              key={card.id}
+              className="min-w-[380px] shrink-0"
+            >
+              <SharedCard
+                imageUrl={card.imageUrl}
+                location={card.location}
+                title={card.title}
+                isFavorite={card.isFavorite}
+                onClick={() => console.log(card.title)}
+                onFavoriteClick={() => toggleFavorite(card.id)}
+              />
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
-export default Home
+export default HomeLandmarks

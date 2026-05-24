@@ -1,12 +1,12 @@
 import { Routes, Route } from 'react-router-dom'
-import { NavigationMenuDemo } from './components/atoms/Navbar'
-import Home from './Pages/Home'
+import Navbar from './components/atoms/Navbar'
+import Home from './Pages/home/Home'
 import Footer from './components/atoms/Footer'
 
 function App() {
   return (
     <div className="flex flex-col">
-      <NavigationMenuDemo />
+      <Navbar />
       {/* <main className="mx-auto flex w-full flex-1 flex-col items-center"> */}
       <Routes>
         <Route

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 
 export default function Footer() {
   return (
-    <footer className=" bg-tertiary">
+    <footer className="bg-tertiary">
       {/* Top Section */}
       <div className="grid gap-12 px-10 py-16 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
