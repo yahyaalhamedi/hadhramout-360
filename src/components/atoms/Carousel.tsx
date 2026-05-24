@@ -13,6 +13,7 @@ import Artisans from '@/assets/images/artisans.png'
 import Community from '@/assets/images/community.png'
 import Events from '@/assets/images/events.png'
 import Landmarks from '@/assets/images/landmarks.png'
+import { useGetRtl } from '@/lib/utils'
 
 const slides = [
   { src: Landmarks, alt: 'Landmarks' },
@@ -22,28 +23,48 @@ const slides = [
 ] as const
 
 export function CarouselPlugin() {
+  const isRtl = useGetRtl()
+  const direction: 'ltr' | 'rtl' = isRtl ? 'rtl' : 'ltr'
+
   const [api, setApi] = React.useState<CarouselApi>()
   const autoplay = React.useMemo(() => Autoplay({ delay: 4000, stopOnInteraction: true }), [])
+
+  const carouselOpts = React.useMemo(
+    () => ({
+      loop: true,
+      align: 'start' as const,
+      direction,
+    }),
+    [direction],
+  )
+
+  React.useEffect(() => {
+    api?.reInit()
+  }, [api, direction])
 
   const handleImageLoad = React.useCallback(() => {
     api?.reInit()
   }, [api])
 
   return (
-    <section className="mx-auto w-full">
+    <section
+      className="mx-auto w-full"
+      dir={direction}
+    >
       <Carousel
+        key={direction}
         setApi={setApi}
-        opts={{ loop: true, align: 'start' }}
+        opts={carouselOpts}
         plugins={[autoplay]}
         className="w-full"
       >
-        <CarouselContent className="">
+        <CarouselContent className="ms-0">
           {slides.map((slide) => (
             <CarouselItem
               key={slide.alt}
-              className=" pl-0"
+              className="basis-full ps-0"
             >
-              <div className="md:aspect-[2.4/1]">
+              <div className="relative aspect-[21/9] w-full overflow-hidden md:aspect-[2.4/1]">
                 <img
                   src={slide.src}
                   alt={slide.alt}
@@ -54,8 +75,8 @@ export function CarouselPlugin() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-4 md:left-6" />
-        <CarouselNext className="right-4 md:right-6" />
+        <CarouselPrevious className="start-4 md:start-6" />
+        <CarouselNext className="end-4 md:end-6" />
       </Carousel>
     </section>
   )

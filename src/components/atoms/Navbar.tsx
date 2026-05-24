@@ -9,11 +9,10 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
+import { useGetRtl } from '@/lib/utils'
 
 const content: { title: string; href: string }[] = [
   { title: 'home', href: '/' },
@@ -36,12 +35,11 @@ function NavMenuItem({ title, href }: { title: string; href: string }) {
   return (
     <NavigationMenuLink
       asChild
-      className={cn(
-        navigationMenuTriggerStyle(),
+      className={
         active
-          ? 'bg-muted text-primary font-medium'
-          : 'text-muted-foreground hover:text-foreground',
-      )}
+          ? 'text-primary font-medium border-b-2 border-primary'
+          : 'text-muted-foreground hover:text-foreground'
+      }
     >
       <NavLink
         to={href}
@@ -56,7 +54,7 @@ function NavMenuItem({ title, href }: { title: string; href: string }) {
 
 export function NavigationMenuDemo() {
   const { t, i18n } = useTranslation()
-  const isRtl = i18n.language.startsWith('ar')
+  const isRtl = useGetRtl()
   const logo = isRtl ? hadhramoutAR : hadhramoutEN
 
   const toggleLanguage = () => {

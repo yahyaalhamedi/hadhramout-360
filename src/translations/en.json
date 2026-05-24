@@ -4,5 +4,7 @@
   "events": "Events",
   "artisans": "Artisans",
   "discover": "Discover",
-  "community": "Community"
+  "community": "Community",
+  "label.view_details": "View Details",
+  "label.view_all": "View all"
 }

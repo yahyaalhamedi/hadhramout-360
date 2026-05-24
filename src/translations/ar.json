@@ -4,5 +4,7 @@
   "events": "الفعاليات",
   "artisans": "الفنانين",
   "discover": "الاكتشاف",
-  "community": "المجتمع"
+  "community": "المجتمع",
+  "label.view_details": "مشاهدة التفاصيل",
+  "label.view_all": "عرض الكل"
 }
