@@ -4,6 +4,8 @@ import Home from './Pages/home/Home'
 import Footer from './components/atoms/Footer'
 import Landmarks from './Pages/landmarks/Landmarks'
 import LandmarkDetail from './Pages/landmarks/LandmarkDetail'
+import Events from './Pages/events/Events'
+import EventDetail from './Pages/events/EventDetail'
 
 function App() {
   return (
@@ -25,7 +27,11 @@ function App() {
         />
         <Route
           path="/events"
-          element={<div>Events</div>}
+          element={<Events />}
+        />
+        <Route
+          path="/events/:slug"
+          element={<EventDetail />}
         />
         <Route
           path="/artisans"

@@ -1,68 +1,14 @@
 import { EventCard } from '@/components/atoms/EventCard'
 import { useGetRtl } from '@/lib/utils'
+import { EVENTS_DATA } from '@/Pages/events/data'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 const HomeEvents = () => {
+  const navigate = useNavigate()
   const { i18n } = useTranslation()
   const isRtl = useGetRtl()
-
-  const eventCards = [
-    {
-      id: 1,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=3',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-    {
-      id: 2,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=4',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-    {
-      id: 3,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=5',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-    {
-      id: 4,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=3',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-    {
-      id: 5,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=4',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-    {
-      id: 6,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-      author: 'Ahmed Bin Hashim',
-      authorImage: 'https://i.pravatar.cc/150?img=5',
-      title: 'The Manhattan of the Desert',
-      location: 'Shibam, Hadhramout',
-      date: 'September 28, 2024',
-    },
-  ]
 
   return (
     <div>
@@ -80,16 +26,20 @@ const HomeEvents = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {eventCards.map((card) => (
+        {EVENTS_DATA.map((event) => (
           <EventCard
-            key={card.id}
-            imageUrl={card.imageUrl}
-            author={card.author}
-            authorImage={card.authorImage}
-            title={card.title}
-            location={card.location}
-            date={card.date}
-            onClick={() => console.log(card.title)}
+            key={event.id}
+            imageUrl={event.imageUrl}
+            author={event.authorName}
+            authorImage={event.authorImage}
+            title={event.title}
+            location={event.location}
+            date={event.date}
+            onClick={() =>
+              navigate(`/events/${event.slug}`, {
+                state: { from: '/events', label: 'Events' },
+              })
+            }
           />
         ))}
       </div>
