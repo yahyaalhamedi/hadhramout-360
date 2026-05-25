@@ -5,6 +5,7 @@ import React from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useGetRtl } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 // ── BackButton ───────────────────────────────────────────────────
 /**
@@ -15,8 +16,9 @@ export const BackButton = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const isRtl = useGetRtl()
+  const { t } = useTranslation()
   const Icon = isRtl ? ArrowRight : ArrowLeft
-  const label = (location.state as { label?: string } | null)?.label ?? 'Back'
+  const label = (location.state as { label?: string } | null)?.label ?? t('label.back')
 
   return (
     <button

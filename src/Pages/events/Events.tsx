@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { EventCard } from '@/components/atoms/EventCard'
 import { EVENTS_DATA } from './data'
 
@@ -10,6 +11,7 @@ const HERO_IMAGE =
 
 const Events = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredEvents = EVENTS_DATA.filter(
@@ -22,9 +24,7 @@ const Events = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      {/* Outer: no overflow-hidden so the search pill can spill out */}
       <div className="relative mx-4 mt-4 h-[340px] md:h-[380px]">
-        {/* Inner: clips the image to rounded corners */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
           <img
             src={HERO_IMAGE}
@@ -40,22 +40,22 @@ const Events = () => {
             className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
             style={{ fontFamily: "'Thmanyah', serif", direction: 'rtl' }}
           >
-            فعاليات حيّة
+            {t('hero.events.ar')}
           </h1>
           <p
             className="text-3xl font-semibold md:text-4xl lg:text-5xl"
             style={{ color: '#cea46c', fontFamily: 'Georgia, serif' }}
           >
-            Vibrant Events
+            {t('hero.events.en')}
           </p>
         </div>
 
-        {/* Search bar — overflows below the hero cover */}
+        {/* Search bar */}
         <div className="absolute bottom-0 left-1/2 w-full max-w-xl -translate-x-1/2 translate-y-1/2 px-4">
           <div className="relative">
             <Input
               type="text"
-              placeholder="Search by name or keyword..."
+              placeholder={t('search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-12 rounded-full bg-white pl-5 pr-12 text-sm shadow-lg border-0 focus-visible:ring-2 focus-visible:ring-secondary-7"
@@ -80,7 +80,7 @@ const Events = () => {
                 date={event.date}
                 onClick={() =>
                   navigate(`/events/${event.slug}`, {
-                    state: { from: '/events', label: 'Events' },
+                    state: { from: '/events', label: t('events') },
                   })
                 }
               />
@@ -89,8 +89,8 @@ const Events = () => {
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
             <Search className="h-12 w-12 opacity-30" />
-            <p className="text-lg font-medium">No events found</p>
-            <p className="text-sm">Try adjusting your search.</p>
+            <p className="text-lg font-medium">{t('event.no_results')}</p>
+            <p className="text-sm">{t('label.adjust_search_simple')}</p>
           </div>
         )}
       </div>

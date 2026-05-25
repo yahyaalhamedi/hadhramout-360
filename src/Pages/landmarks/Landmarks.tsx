@@ -87,13 +87,13 @@ const Landmarks = () => {
             className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
             style={{ fontFamily: "'Thmanyah', serif", direction: 'rtl' }}
           >
-            معالم خالدة
+            {t('hero.landmarks.ar')}
           </h1>
           <p
             className="text-3xl font-semibold md:text-4xl lg:text-5xl"
             style={{ color: '#cea46c', fontFamily: 'Georgia, serif' }}
           >
-            Timeless Landmarks
+            {t('hero.landmarks.en')}
           </p>
         </div>
 
@@ -192,8 +192,8 @@ const Landmarks = () => {
         ) : (
           <div className="col-span-2 flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
             <Search className="h-12 w-12 opacity-30" />
-            <p className="text-lg font-medium">No landmarks found</p>
-            <p className="text-sm">Try adjusting your search or filters.</p>
+            <p className="text-lg font-medium">{t('landmark.no_results')}</p>
+            <p className="text-sm">{t('label.adjust_search')}</p>
           </div>
         )}
       </div>

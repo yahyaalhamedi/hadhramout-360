@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 const HomeLandmarks = () => {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const navigate = useNavigate()
   const isRtl = useGetRtl()
 
@@ -54,7 +54,7 @@ const HomeLandmarks = () => {
                 title={card.title}
                 isFavorite={card.isFavorite}
                 onClick={() =>
-                  navigate(`/landmarks/${card.slug}`, { state: { from: '/', label: 'Home' } })
+                  navigate(`/landmarks/${card.slug}`, { state: { from: '/', label: t('landmarks') } })
                 }
                 onFavoriteClick={() => toggleFavorite(card.id)}
                 className="h-[400px] w-fit"

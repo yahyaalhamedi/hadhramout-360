@@ -1,19 +1,27 @@
+import hadhramoutAR from '@/assets/hadhramoutAR.svg'
+import hadhramoutEN from '@/assets/hadhramoutEN.svg'
 import { Camera, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
+import { useGetRtl } from '@/lib/utils'
 
 export default function Footer() {
+  const { t } = useTranslation()
+  const isRtl = useGetRtl()
+  const logo = isRtl ? hadhramoutAR : hadhramoutEN
+
   return (
     <footer className="bg-tertiary">
       {/* Top Section */}
       <div className="grid gap-12 px-10 py-16 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-primary">Hadhramout 360</h2>
-
-          <p className="max-w-sm text-lg leading-9 text-muted-foreground">
-            Preserving and promoting the breathtaking cultural heritage of Hadhramout for a global
-            audience.
-          </p>
+          <img
+            src={logo}
+            alt="Hadhramout 360"
+            className="max-w-[200px] object-contain"
+          />
+          <p className="max-w-sm text-lg leading-9 text-muted-foreground">{t('footer.tagline')}</p>
 
           <div className="flex items-center gap-4">
             <Button
@@ -36,86 +44,71 @@ export default function Footer() {
 
         {/* Quick Links */}
         <div className="space-y-6">
-          <h3 className="text-2xl font-semibold">Quick Links</h3>
+          <h3 className="text-2xl font-semibold">{t('footer.quick_links')}</h3>
 
           <div className="flex flex-col gap-5 text-lg text-muted-foreground">
             <a
               href="#"
               className="transition-colors hover:text-primary"
             >
-              About Us
+              {t('footer.about')}
             </a>
 
             <a
               href="#"
               className="transition-colors hover:text-primary"
             >
-              Sign up as Org.
+              {t('footer.signup_org')}
             </a>
 
             <a
               href="#"
               className="transition-colors hover:text-primary"
             >
-              Contact
+              {t('footer.contact')}
             </a>
           </div>
         </div>
 
         {/* Legal */}
         <div className="space-y-6">
-          <h3 className="text-2xl font-semibold">Legal</h3>
+          <h3 className="text-2xl font-semibold">{t('footer.legal')}</h3>
 
           <div className="flex flex-col gap-5 text-lg text-muted-foreground">
             <a
               href="#"
               className="transition-colors hover:text-primary"
             >
-              Privacy Policy
+              {t('footer.privacy')}
             </a>
 
             <a
               href="#"
               className="transition-colors hover:text-primary"
             >
-              Terms of Service
+              {t('footer.terms')}
             </a>
           </div>
         </div>
 
         {/* Subscribe */}
         <div className="space-y-6">
-          <h3 className="text-2xl font-semibold">Subscribe</h3>
+          <h3 className="text-2xl font-semibold">{t('footer.subscribe')}</h3>
 
           <p className="max-w-sm text-lg leading-8 text-muted-foreground">
-            Stay updated with the latest events and cultural discoveries.
+            {t('footer.subscribe_desc')}
           </p>
-
-          {/* <div className="flex items-center gap-3">
-            <Input
-              type="email"
-              placeholder="Email address"
-              className="h-14 rounded-2xl border-0 bg-background text-base"
-            />
-
-            <Button
-              size="icon"
-              className="h-14 w-14 rounded-2xl"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div> */}
         </div>
       </div>
 
       {/* Bottom Section */}
       <div className="flex flex-col items-center justify-between gap-6 border-t px-10 py-8 text-muted-foreground md:flex-row">
-        <p className="text-lg">© 2024 Hadhramout 360. All rights reserved.</p>
+        <p className="text-lg">{t('footer.copyright')}</p>
 
         <div className="flex items-center gap-8 text-lg font-medium text-primary">
-          <a href="#">Discover</a>
-          <a href="#">Engage</a>
-          <a href="#">Preserve</a>
+          <a href="#">{t('footer.link.discover')}</a>
+          <a href="#">{t('footer.link.engage')}</a>
+          <a href="#">{t('footer.link.preserve')}</a>
         </div>
       </div>
     </footer>

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { Calendar, MapPin, Ticket, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { useTranslation } from 'react-i18next'
 import {
   DetailHero,
   DetailInfoRow,
@@ -12,6 +13,7 @@ import { EVENTS_DATA } from './data'
 
 const EventDetail = () => {
   const { slug } = useParams<{ slug: string }>()
+  const { t } = useTranslation()
 
   const event = EVENTS_DATA.find((e) => e.slug === slug)
 
@@ -19,8 +21,8 @@ const EventDetail = () => {
     return (
       <DetailNotFound
         icon={Calendar}
-        message="Event not found"
-        ctaLabel="Back to Events"
+        message={t('event.not_found')}
+        ctaLabel={t('event.back')}
       />
     )
   }
@@ -62,7 +64,7 @@ const EventDetail = () => {
           onClick={() => window.open(mapsUrl, '_blank')}
           className="mt-5 rounded-full bg-primary-7 px-7 text-white hover:bg-primary-8"
         >
-          Register Now
+          {t('label.register_now')}
         </Button>
       </DetailHero>
 
@@ -78,7 +80,7 @@ const EventDetail = () => {
               </Avatar>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Hosted by
+                  {t('label.hosted_by')}
                 </p>
                 <p className="text-sm font-medium text-foreground">{event.authorName}</p>
               </div>
@@ -102,25 +104,26 @@ const EventDetail = () => {
           <aside className="space-y-5">
             {/* Event Details card */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-semibold text-foreground">Event Details</h3>
+              <h3 className="text-base font-semibold text-foreground">
+                {t('event.sidebar.details')}
+              </h3>
 
               <DetailInfoRow
                 icon={Calendar}
-                label="Dates"
+                label={t('event.sidebar.dates')}
                 value={event.dateRange}
               />
               <DetailInfoRow
                 icon={Ticket}
-                label="Admission"
+                label={t('event.sidebar.admission')}
                 value={event.admission}
               />
             </div>
 
             {/* Map card */}
             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              {/* Embedded OSM map */}
               <iframe
-                title="Event location map"
+                title={t('event.map.title')}
                 src={osmMapUrl}
                 className="h-48 w-full border-0"
                 loading="lazy"
@@ -135,7 +138,7 @@ const EventDetail = () => {
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Open in Maps
+                  {t('label.open_in_maps')}
                 </a>
               </div>
             </div>
@@ -144,8 +147,8 @@ const EventDetail = () => {
 
         {/* ── Photo Gallery ──────────────────────────────────────── */}
         <DetailGallery
-          eyebrow="Visual Highlights"
-          heading={`Moments from ${event.location.split(',')[0]}`}
+          eyebrow={t('event.gallery.eyebrow')}
+          heading={`${t('event.gallery.heading')} ${event.location.split(',')[0]}`}
           images={event.gallery}
         />
       </div>

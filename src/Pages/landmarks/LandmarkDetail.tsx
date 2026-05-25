@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { LANDMARKS_DATA } from './data'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DetailHero,
   DetailInfoRow,
@@ -14,6 +15,7 @@ import {
 
 const LandmarkDetail = () => {
   const { slug } = useParams<{ slug: string }>()
+  const { t } = useTranslation()
 
   const landmark = LANDMARKS_DATA.find((l) => l.slug === slug)
   const [isFavorite, setIsFavorite] = useState(landmark?.isFavorite ?? false)
@@ -22,8 +24,8 @@ const LandmarkDetail = () => {
     return (
       <DetailNotFound
         icon={MapPin}
-        message="Landmark not found"
-        ctaLabel="Back to Landmarks"
+        message={t('landmark.not_found')}
+        ctaLabel={t('landmark.back')}
       />
     )
   }
@@ -70,7 +72,9 @@ const LandmarkDetail = () => {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Left — main article content */}
           <article className="lg:col-span-2 space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">Architectural Heritage</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              {t('landmark.section.heritage')}
+            </h2>
 
             {landmark.description.map((para, i) => (
               <p
@@ -88,39 +92,41 @@ const LandmarkDetail = () => {
           <aside className="space-y-5">
             {/* Quick Overview card */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-semibold text-foreground">Quick Overview</h3>
+              <h3 className="text-base font-semibold text-foreground">
+                {t('landmark.sidebar.overview')}
+              </h3>
 
               <DetailInfoRow
                 icon={MapPin}
-                label="Location"
+                label={t('landmark.sidebar.location')}
                 value={landmark.overview.location}
               />
               <DetailInfoRow
                 icon={Layers}
-                label="Style"
+                label={t('landmark.sidebar.style')}
                 value={landmark.overview.style}
               />
               <DetailInfoRow
                 icon={Clock}
-                label="Status"
+                label={t('landmark.sidebar.status')}
                 value={landmark.overview.status}
               />
               <DetailInfoRow
                 icon={Sun}
-                label="Best Time to Visit"
+                label={t('landmark.sidebar.best_time')}
                 value={landmark.overview.bestTime}
               />
 
               <Button className="w-full rounded-full bg-primary-7 text-white hover:bg-primary-8 gap-2">
                 <BookOpen className="h-4 w-4" />
-                Book a Local Guide
+                {t('label.book_guide')}
               </Button>
             </div>
 
             {/* Did You Know card */}
             <div className="rounded-2xl border border-secondary-3 bg-secondary-1/50 p-6 space-y-2">
               <p className="text-xs font-bold uppercase tracking-widest text-secondary-8">
-                Did You Know?
+                {t('landmark.sidebar.did_you_know')}
               </p>
               <p className="text-sm leading-relaxed text-secondary-10">{landmark.didYouKnow}</p>
             </div>
@@ -129,8 +135,8 @@ const LandmarkDetail = () => {
 
         {/* ── Photo Gallery ──────────────────────────────────────── */}
         <DetailGallery
-          eyebrow="Visual Journey"
-          heading={`The Lens of ${landmark.location.split(',')[0]}`}
+          eyebrow={t('landmark.gallery.eyebrow')}
+          heading={`${t('landmark.gallery.heading')} ${landmark.location.split(',')[0]}`}
           images={landmark.gallery}
         />
       </div>
