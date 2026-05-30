@@ -2,6 +2,7 @@ import { Heart, MapPin, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn, useGetRtl } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
+import { baseURL } from '@/api/axiosInstance'
 
 interface SharedCardProps {
   imageUrl: string
@@ -25,11 +26,13 @@ export default function SharedCard({
   const { t } = useTranslation()
   const isRtl = useGetRtl()
 
+  const image = `${baseURL}${imageUrl}`
+
   return (
     <div className={`group relative overflow-hidden rounded-[32px] ${className}`}>
       {/* Background Image */}
       <img
-        src={imageUrl}
+        src={image}
         alt={title}
         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
       />

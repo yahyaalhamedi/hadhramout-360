@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, X } from 'lucide-react'
 import { ChevronDown } from 'lucide-react'
+import InfiniteScroll from 'react-infinite-scroller'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,8 +13,9 @@ import {
 import SharedCard from '@/components/atoms/SharedCard'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { LANDMARKS_DATA } from './data'
-
+import { useGetRtl } from '@/lib/utils'
+import { useLandmarks } from '@/api/landmarks/useLandmarks'
+import { useCategories } from '@/api/categories/useCategories'
 
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
@@ -21,67 +23,67 @@ const HERO_IMAGE =
 const Landmarks = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const isRtl = useGetRtl()
+
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['Historical'])
-  const [cards, setCards] = useState(LANDMARKS_DATA)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([])
 
-  const CATEGORIES = [
-    { name: t('label.historical'), value: 'Historical' },
-    { name: t('label.cultural'), value: 'Cultural' },
-    { name: t('label.natural'), value: 'Natural' },
-    { name: t('label.modern'), value: 'Modern' },
-  ]
+  const { data, fetchNextPage, hasNextPage, isFetching, isError } = useLandmarks({
+    pageSize: 10,
+    search: debouncedSearch || undefined,
+    categoryId: selectedCategoryIds[0],
+  })
 
-  const toggleFavorite = (id: number) => {
-    setCards((prev) =>
-      prev.map((card) => (card.id === id ? { ...card, isFavorite: !card.isFavorite } : card)),
-    )
+  // Fire the API search only once, 1000ms after the user stops typing.
+  // useEffect cleanup cancels the pending timer on every new keystroke,
+  // so setDebouncedSearch is never called mid-word.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const handleSearchChange = (value: string) => setSearchTerm(value)
+
+  const items = data?.pages.flatMap((p) => p.items) ?? []
+
+  // Fetch all categories from the API for the filter dropdown
+  const { data: categories = [] } = useCategories()
+
+  const toggleCategory = (id: number, checked: boolean) => {
+    setSelectedCategoryIds((prev) => (checked ? [...prev, id] : prev.filter((c) => c !== id)))
   }
 
-  const removeFilter = (filter: string) => {
-    setSelectedCategories((prev) => prev.filter((f) => f !== filter))
+  const removeCategory = (id: number) => {
+    setSelectedCategoryIds((prev) => prev.filter((c) => c !== id))
   }
 
   const clearFilters = () => {
-    setSelectedCategories([])
+    setSelectedCategoryIds([])
     setSearchTerm('')
+    setDebouncedSearch('')
   }
 
-  const toggleCategory = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories((prev) => [...prev, category])
-    } else {
-      setSelectedCategories((prev) => prev.filter((c) => c !== category))
-    }
+  const getCategoryLabel = (id: number) => {
+    const cat = categories.find((c) => c.categoryId === id)
+    return cat ? (isRtl ? cat.categoryNameAr : cat.categoryNameEn) : String(id)
   }
-
-  const filteredCards = cards.filter((card) => {
-    const matchesSearch =
-      searchTerm === '' ||
-      card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      card.location.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory =
-      selectedCategories.length === 0 || selectedCategories.includes(card.category)
-    return matchesSearch && matchesCategory
-  })
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ── Hero Section ─────────────────────────────────────────── */}
-      {/* Outer: relative but NO overflow-hidden so the search pill can spill out */}
+      {/* Hero */}
       <div className="relative mx-4 mt-4 h-[420px] md:h-[480px]">
-        {/* Inner: overflow-hidden keeps the image clipped to rounded corners */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
           <img
             src={HERO_IMAGE}
             alt="Hadhramout Landmarks"
             className="h-full w-full object-cover"
           />
-          {/* Dark gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
         </div>
 
-        {/* Hero text — sits on top of inner image container */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
           <h1
             className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
@@ -97,27 +99,25 @@ const Landmarks = () => {
           </p>
         </div>
 
-        {/* Search + Filter bar — overflows below the hero cover */}
+        {/* Search + Filter bar */}
         <div className="absolute bottom-0 left-1/2 w-full max-w-2xl -translate-x-1/2 translate-y-1/2 px-4">
           <div className="flex items-center gap-2">
-            {/* Search input */}
             <div className="relative flex-1">
               <Input
                 type="text"
                 placeholder={t('search.placeholder')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-12 rounded-full bg-white pl-5 pr-12 text-sm shadow-lg border-0 focus-visible:ring-2 focus-visible:ring-secondary-7"
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="h-12 rounded-full border-0 bg-white pl-5 pr-12 text-sm shadow-lg focus-visible:ring-2 focus-visible:ring-secondary-7"
               />
               <Search className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
 
-            {/* Category dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-12 rounded-full bg-white px-5 shadow-lg border-0 gap-1 font-medium hover:bg-white/90"
+                  className="h-12 rounded-full border-0 bg-white px-5 shadow-lg gap-1 font-medium hover:bg-white/90"
                 >
                   {t('label.category')}
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -125,15 +125,18 @@ const Landmarks = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-48 mt-1"
+                className="mt-1 w-48"
               >
-                {CATEGORIES.map((category) => (
+                {categories.length === 0 && (
+                  <p className="px-3 py-2 text-sm text-muted-foreground">{t('label.no_results')}</p>
+                )}
+                {categories.map((cat) => (
                   <DropdownMenuCheckboxItem
-                    key={category.value}
-                    checked={selectedCategories.includes(category.value)}
-                    onCheckedChange={(checked) => toggleCategory(category.value, checked)}
+                    key={cat.categoryId}
+                    checked={selectedCategoryIds.includes(cat.categoryId)}
+                    onCheckedChange={(checked) => toggleCategory(cat.categoryId, checked)}
                   >
-                    {category.name}
+                    {isRtl ? cat.categoryNameAr : cat.categoryNameEn}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuContent>
@@ -142,23 +145,23 @@ const Landmarks = () => {
         </div>
       </div>
 
-      {/* ── Active Filters ────────────────────────────────────────── */}
+      {/* Active Filters */}
       <div className="mt-16 px-4">
-        {selectedCategories.length > 0 && (
+        {selectedCategoryIds.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               {t('label.active_filters')}
             </span>
-            {selectedCategories.map((filter) => (
+            {selectedCategoryIds.map((id) => (
               <span
-                key={filter}
-                className="inline-flex items-center gap-1.5 rounded-full border border-secondary-6 px-3 py-1 text-sm font-medium text-secondary-8 bg-white"
+                key={id}
+                className="inline-flex items-center gap-1.5 rounded-full border border-secondary-6 bg-white px-3 py-1 text-sm font-medium text-secondary-8"
               >
-                {filter}
+                {getCategoryLabel(id)}
                 <button
-                  onClick={() => removeFilter(filter)}
-                  className="ml-0.5 rounded-full p-0.5 hover:bg-secondary-2 transition-colors"
-                  aria-label={`Remove ${filter} filter`}
+                  onClick={() => removeCategory(id)}
+                  className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-secondary-2"
+                  aria-label={`Remove filter`}
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -166,7 +169,7 @@ const Landmarks = () => {
             ))}
             <button
               onClick={clearFilters}
-              className="text-sm font-medium text-primary-7 hover:text-primary-9 underline-offset-2 hover:underline transition-colors"
+              className="text-sm font-medium text-primary-7 underline-offset-2 transition-colors hover:text-primary-9 hover:underline"
             >
               {t('label.clear_filters')}
             </button>
@@ -174,26 +177,74 @@ const Landmarks = () => {
         )}
       </div>
 
-      {/* ── Card Grid ────────────────────────────────────────────── */}
-      <div className="mt-6 px-4 pb-12 grid gap-6 md:grid-cols-1 xl:grid-cols-2">
-        {filteredCards.length > 0 ? (
-          filteredCards.map((card) => (
-            <SharedCard
-              key={card.id}
-              imageUrl={card.imageUrl}
-              location={card.location}
-              title={card.title}
-              isFavorite={card.isFavorite}
-              onClick={() => navigate(`/landmarks/${card.slug}`, { state: { from: '/landmarks', label: 'Landmarks' } })}
-              onFavoriteClick={() => toggleFavorite(card.id)}
-              className="h-[400px]"
-            />
-          ))
-        ) : (
-          <div className="col-span-2 flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
-            <Search className="h-12 w-12 opacity-30" />
-            <p className="text-lg font-medium">{t('landmark.no_results')}</p>
-            <p className="text-sm">{t('label.adjust_search')}</p>
+      {/* Error */}
+      {isError && <p className="mt-8 px-4 text-destructive">{t('label.no_results')}</p>}
+
+      {/* Card Grid with Infinite Scroll */}
+      <div className="mt-6 px-4 pb-12">
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={() => {
+            if (!isFetching) void fetchNextPage()
+          }}
+          hasMore={!!hasNextPage}
+          loader={
+            <div
+              key="loader"
+              className="mt-6 grid gap-6 md:grid-cols-1 xl:grid-cols-2"
+            >
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[400px] animate-pulse rounded-[32px] bg-muted"
+                />
+              ))}
+            </div>
+          }
+        >
+          {items.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-1 xl:grid-cols-2">
+              {items.map((landmark) => {
+                const title = isRtl ? landmark.titleAr : landmark.titleEn
+                const location = isRtl ? landmark.locationTextAr : landmark.locationTextEn
+
+                return (
+                  <SharedCard
+                    key={landmark.landmarkId}
+                    imageUrl={landmark.coverMediaUrl}
+                    location={location}
+                    title={title}
+                    isFavorite={landmark.isFavorite}
+                    onClick={() =>
+                      navigate(`/landmarks/${landmark.landmarkId}`, {
+                        state: { from: '/landmarks', label: t('landmarks') },
+                      })
+                    }
+                    className="h-[400px]"
+                  />
+                )
+              })}
+            </div>
+          ) : (
+            !isFetching && (
+              <div className="col-span-2 flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
+                <Search className="h-12 w-12 opacity-30" />
+                <p className="text-lg font-medium">{t('landmark.no_results')}</p>
+                <p className="text-sm">{t('label.adjust_search')}</p>
+              </div>
+            )
+          )}
+        </InfiniteScroll>
+
+        {/* Initial loading skeletons */}
+        {isFetching && items.length === 0 && (
+          <div className="grid gap-6 md:grid-cols-1 xl:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-[400px] animate-pulse rounded-[32px] bg-muted"
+              />
+            ))}
           </div>
         )}
       </div>
