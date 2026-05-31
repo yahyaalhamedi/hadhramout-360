@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGetRtl } from '@/lib/utils'
 import { useLandmarks } from '@/api/landmarks/useLandmarks'
 import { useCategories } from '@/api/categories/useCategories'
+import { useToggleFavorite } from '@/api/favorites/useFavorites'
 
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
@@ -38,6 +39,8 @@ const Landmarks = () => {
   // Fire the API search only once, 1000ms after the user stops typing.
   // useEffect cleanup cancels the pending timer on every new keystroke,
   // so setDebouncedSearch is never called mid-word.
+  const { mutate: toggleFavorite } = useToggleFavorite()
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm)
@@ -211,10 +214,11 @@ const Landmarks = () => {
                 return (
                   <SharedCard
                     key={landmark.landmarkId}
-                    imageUrl={landmark.coverMediaUrl}
+                    imageUrl={landmark.coverMediaUrl || ''}
                     location={location}
                     title={title}
                     isFavorite={landmark.isFavorite}
+                    onFavoriteClick={() => toggleFavorite(landmark.landmarkId)}
                     onClick={() =>
                       navigate(`/landmarks/${landmark.landmarkId}`, {
                         state: { from: '/landmarks', label: t('landmarks') },

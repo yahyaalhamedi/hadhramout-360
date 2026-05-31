@@ -23,7 +23,7 @@ export const BackButton = () => {
   return (
     <button
       onClick={() => navigate(-1)}
-      className="absolute left-6 top-6 z-10 flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/25"
+      className="absolute start-6 top-6 z-10 flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/25"
     >
       <Icon className="h-4 w-4" />
       {label}
@@ -54,10 +54,10 @@ export const DetailHero = ({ imageUrl, imageAlt, children, topRight }: DetailHer
     <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/85" />
 
     <BackButton />
-    {topRight && <div className="absolute right-6 top-6 z-10">{topRight}</div>}
+    {topRight && <div className="absolute end-6 top-6 z-10">{topRight}</div>}
 
-    {/* Bottom-left content */}
-    <div className="absolute bottom-0 left-0 px-6 pb-8 md:px-12">{children}</div>
+    {/* Bottom-start content */}
+    <div className="absolute bottom-0 start-0 px-6 pb-8 md:px-12">{children}</div>
   </div>
 )
 

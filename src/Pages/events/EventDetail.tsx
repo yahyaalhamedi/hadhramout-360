@@ -28,7 +28,8 @@ const EventDetail = () => {
   }
 
   const mapsUrl = `https://www.google.com/maps?q=${event.mapLat},${event.mapLng}`
-  const osmMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${event.mapLng - 0.05},${event.mapLat - 0.05},${event.mapLng + 0.05},${event.mapLat + 0.05}&layer=mapnik&marker=${event.mapLat},${event.mapLng}`
+  // const osmMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${event.mapLng - 0.05},${event.mapLat - 0.05},${event.mapLng + 0.05},${event.mapLat + 0.05}&layer=mapnik&marker=${event.mapLat},${event.mapLng}`
+  const osmMapUrl = 'https://maps.google.com/?q=24.6310,46.7136'
 
   return (
     <div className="min-h-screen bg-background">

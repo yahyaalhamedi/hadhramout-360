@@ -6,10 +6,12 @@ import Landmarks from './Pages/landmarks/Landmarks'
 import LandmarkDetail from './Pages/landmarks/LandmarkDetail'
 import Events from './Pages/events/Events'
 import EventDetail from './Pages/events/EventDetail'
+import ScrollToTop from './components/atoms/ScrollToTop'
 
 function App() {
   return (
     <div className="flex flex-col">
+      <ScrollToTop />
       <Navbar />
       {/* <main className="mx-auto flex w-full flex-1 flex-col items-center"> */}
       <Routes>

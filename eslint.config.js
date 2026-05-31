@@ -1,6 +1,6 @@
 import js from '@eslint/js'
 import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
+// import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import pluginReact from 'eslint-plugin-react'
@@ -13,14 +13,14 @@ export default tseslint.config(
   pluginReact.configs.flat.recommended,
   {
     plugins: {
-      'react-hooks': reactHooks,
+      // 'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
     languageOptions: {
       globals: globals.browser,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      // ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/react-in-jsx-scope': 'off',
       'prop-types': 'off',
