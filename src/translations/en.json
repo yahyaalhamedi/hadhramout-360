@@ -79,6 +79,9 @@
   "artisan.community.card_description": "A skilled craftsperson preserving traditional Hadhrami arts.",
 
   "discover.no_results": "No places found",
+  "discover.not_found": "Content not found",
+  "discover.back": "Back to Discover",
+  "discover.no_description": "No description available.",
 
   "community.hi": "Hi,",
   "community.post_content": "POST CONTENT",

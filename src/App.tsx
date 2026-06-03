@@ -11,6 +11,7 @@ import AuthPage from './Pages/auth/AuthPage'
 import Artisans from './Pages/artisans/Artisans'
 import ArtisanDetail from './Pages/artisans/ArtisanDetail'
 import Discover from './Pages/discover/Discover'
+import DiscoverDetail from './Pages/discover/DiscoverDetail'
 import Community from './Pages/community/Community'
 
 function App() {
@@ -55,6 +56,10 @@ function App() {
         <Route
           path="/discover"
           element={<Discover />}
+        />
+        <Route
+          path="/discover/:slug"
+          element={<DiscoverDetail />}
         />
         <Route
           path="/community"

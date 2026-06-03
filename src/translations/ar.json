@@ -79,6 +79,9 @@
   "artisan.community.card_description": "حرفي ماهر يحافظ على الفنون الحضرمية التقليدية.",
 
   "discover.no_results": "لا توجد أماكن",
+  "discover.not_found": "المحتوى غير موجود",
+  "discover.back": "العودة إلى الاكتشاف",
+  "discover.no_description": "لا يوجد وصف متاح.",
 
   "community.hi": "مرحباً،",
   "community.post_content": "محتوى المنشور",

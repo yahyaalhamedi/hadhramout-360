@@ -5,6 +5,7 @@ import InfiniteScroll from 'react-infinite-scroller'
 import { Input } from '@/components/ui/input'
 import DiscoverCard from '@/components/atoms/DiscoverCard'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { useGetRtl } from '@/lib/utils'
 import { useDiscoverContent } from '@/api/discover/useDiscoverContent'
 import type { DiscoverContentCategory } from '@/api/discover/useDiscoverContent.types'
@@ -30,6 +31,7 @@ const TABS: Tab[] = [
 
 const Discover = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const isRtl = useGetRtl()
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -181,7 +183,11 @@ const Discover = () => {
                     key={content.contentId}
                     imageUrl={content.coverImageUrl || ''}
                     title={title || ''}
-                    onClick={() => {}}
+                    onClick={() =>
+                      navigate(`/discover/${content.contentId}`, {
+                        state: { from: '/discover', label: t('discover') },
+                      })
+                    }
                   />
                 )
               })}
