@@ -14,40 +14,40 @@ export default function Footer() {
   return (
     <footer className="bg-tertiary">
       {/* Top Section */}
-      <div className="grid gap-8 px-4 py-10 sm:gap-10 sm:px-6 sm:py-12 md:grid-cols-2 md:gap-12 md:px-10 md:py-16 lg:grid-cols-4 lg:px-16 xl:px-20">
+      <div className="grid gap-12 px-10 py-16 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6">
           <img
             src={logo}
             alt="Hadhramout 360"
-            className="max-w-[160px] object-contain sm:max-w-[200px]"
+            className="max-w-[200px] object-contain"
           />
-          <p className="max-w-sm text-base leading-7 text-muted-foreground sm:text-lg sm:leading-9">{t('footer.tagline')}</p>
+          <p className="max-w-sm text-lg leading-9 text-muted-foreground">{t('footer.tagline')}</p>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-4">
             <Button
               size="icon"
               variant="ghost"
-              className="h-11 w-11 rounded-xl bg-white sm:h-14 sm:w-14 sm:rounded-2xl"
+              className="h-14 w-14 rounded-2xl bg-white"
             >
-              <Share2 className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
+              <Share2 className="h-5 w-5 text-primary" />
             </Button>
 
             <Button
               size="icon"
               variant="ghost"
-              className="h-11 w-11 rounded-xl bg-white sm:h-14 sm:w-14 sm:rounded-2xl"
+              className="h-14 w-14 rounded-2xl bg-white"
             >
-              <Camera className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
+              <Camera className="h-5 w-5 text-primary" />
             </Button>
           </div>
         </div>
 
         {/* Quick Links */}
-        <div className="space-y-4 sm:space-y-6">
-          <h3 className="text-xl font-semibold sm:text-2xl">{t('footer.quick_links')}</h3>
+        <div className="space-y-6">
+          <h3 className="text-2xl font-semibold">{t('footer.quick_links')}</h3>
 
-          <div className="flex flex-col gap-3 text-base text-muted-foreground sm:gap-5 sm:text-lg">
+          <div className="flex flex-col gap-5 text-lg text-muted-foreground">
             <a
               href="#"
               className="transition-colors hover:text-primary"
@@ -72,10 +72,10 @@ export default function Footer() {
         </div>
 
         {/* Legal */}
-        <div className="space-y-4 sm:space-y-6">
-          <h3 className="text-xl font-semibold sm:text-2xl">{t('footer.legal')}</h3>
+        <div className="space-y-6">
+          <h3 className="text-2xl font-semibold">{t('footer.legal')}</h3>
 
-          <div className="flex flex-col gap-3 text-base text-muted-foreground sm:gap-5 sm:text-lg">
+          <div className="flex flex-col gap-5 text-lg text-muted-foreground">
             <a
               href="#"
               className="transition-colors hover:text-primary"
@@ -93,20 +93,20 @@ export default function Footer() {
         </div>
 
         {/* Subscribe */}
-        <div className="space-y-4 sm:space-y-6">
-          <h3 className="text-xl font-semibold sm:text-2xl">{t('footer.subscribe')}</h3>
+        <div className="space-y-6">
+          <h3 className="text-2xl font-semibold">{t('footer.subscribe')}</h3>
 
-          <p className="max-w-sm text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+          <p className="max-w-sm text-lg leading-8 text-muted-foreground">
             {t('footer.subscribe_desc')}
           </p>
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="flex flex-col items-center justify-between gap-4 border-t px-4 py-6 text-muted-foreground sm:gap-6 sm:px-6 sm:py-8 md:flex-row md:px-10 lg:px-16 xl:px-20">
-        <p className="text-sm text-center sm:text-lg">{t('footer.copyright')}</p>
+      <div className="flex flex-col items-center justify-between gap-6 border-t px-10 py-8 text-muted-foreground md:flex-row">
+        <p className="text-lg">{t('footer.copyright')}</p>
 
-        <div className="flex items-center gap-4 text-sm font-medium text-primary sm:gap-8 sm:text-lg">
+        <div className="flex items-center gap-8 text-lg font-medium text-primary">
           <a href="#">{t('footer.link.discover')}</a>
           <a href="#">{t('footer.link.engage')}</a>
           <a href="#">{t('footer.link.preserve')}</a>

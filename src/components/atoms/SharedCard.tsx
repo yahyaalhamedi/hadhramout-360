@@ -29,7 +29,7 @@ export default function SharedCard({
   const image = `${baseURL}${imageUrl}`
 
   return (
-    <div className={`group relative overflow-hidden rounded-[24px] sm:rounded-[28px] md:rounded-[32px] ${className}`}>
+    <div className={`group relative overflow-hidden rounded-[32px] ${className}`}>
       {/* Background Image */}
       <img
         src={image}
@@ -41,30 +41,30 @@ export default function SharedCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col sm:flex-row sm:justify-between sm:items-end sm:p-6 md:p-8">
-        <div className="mb-3 sm:mb-0">
+      <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between">
+        <div>
           {/* Location */}
-          <div className="mb-2 flex items-center gap-1.5 text-xs text-white/90 sm:mb-3 sm:gap-2 sm:text-sm">
-            <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <div className="mb-3 flex items-center gap-2 text-sm text-white/90">
+            <MapPin className="h-4 w-4" />
             <span>{location}</span>
           </div>
 
           {/* Title */}
-          <h2 className="max-w-[90%] text-base font-bold leading-tight text-white sm:max-w-[80%] sm:text-lg md:text-xl">{title}</h2>
+          <h2 className="max-w-[80%] text-xl font-bold leading-tight text-white">{title}</h2>
         </div>
 
         {/* Bottom Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="mt-8 flex items-center gap-3">
           {/* Details Button */}
           <Button
             onClick={onClick}
-            className="h-10 rounded-full bg-secondary px-4 text-xs text-secondary-8 font-semibold hover:bg-secondary-1 cursor-pointer sm:h-12 sm:px-6 sm:text-sm md:h-14 md:px-8 md:text-base"
+            className="h-14 rounded-full bg-secondary px-8 text-secondary-8 font-semibold  hover:bg-secondary-1 cursor-pointer"
           >
             {t('label.view_details')}
             {isRtl ? (
-              <ArrowLeft className="ml-1.5 h-4 w-4 sm:ml-2 sm:h-5 sm:w-5" />
+              <ArrowLeft className="ml-2 h-5 w-5" />
             ) : (
-              <ArrowRight className="ml-1.5 h-4 w-4 sm:ml-2 sm:h-5 sm:w-5" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             )}
           </Button>
 
@@ -72,14 +72,13 @@ export default function SharedCard({
           <button
             onClick={onFavoriteClick}
             className={cn(
-              'flex items-center justify-center rounded-full border backdrop-blur-md transition-all cursor-pointer',
-              'h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14',
+              'flex h-14 w-14 items-center justify-center rounded-full border backdrop-blur-md transition-all cursor-pointer',
               isFavorite
                 ? 'border-white bg-secondary text-secondary-9'
                 : 'border-white/30 bg-white/10 text-white hover:bg-white/20',
             )}
           >
-            <Heart className={cn('h-4 w-4 sm:h-5 sm:w-5', isFavorite && 'fill-current')} />
+            <Heart className={cn('h-5 w-5', isFavorite && 'fill-current')} />
           </button>
         </div>
       </div>

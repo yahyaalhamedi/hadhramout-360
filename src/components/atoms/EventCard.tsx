@@ -28,7 +28,7 @@ export function EventCard({
   const isRtl = useGetRtl()
 
   return (
-    <div className="group relative h-[380px] w-full overflow-hidden rounded-[28px] sm:h-[440px] sm:rounded-[32px] md:h-[520px] md:rounded-[40px]">
+    <div className="group relative h-[520px] w-full overflow-hidden rounded-[40px]">
       {/* Background Image */}
       <img
         src={imageUrl}
@@ -40,28 +40,28 @@ export function EventCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
       {/* Content */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col p-4 sm:p-5">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col p-5">
         {/* Author */}
-        <div className="mb-3 flex items-center gap-2 sm:mb-5 sm:gap-3">
-          <Avatar className="h-8 w-8 border border-white/30 sm:h-10 sm:w-10">
+        <div className="mb-5 flex items-center gap-3">
+          <Avatar className="h-10 w-10 border border-white/30">
             <AvatarImage src={authorImage} />
           </Avatar>
 
-          <span className="text-xs text-white sm:text-sm">{author}</span>
+          <span className="text-sm text-white">{author}</span>
         </div>
 
         {/* Title */}
-        <h2 className="mb-3 text-xl font-bold leading-tight text-white sm:mb-5 sm:text-2xl md:text-4xl">{title}</h2>
+        <h2 className="mb-5 text-4xl font-bold leading-tight text-white">{title}</h2>
 
         {/* Meta */}
-        <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-white/90 sm:mb-8 sm:gap-6 sm:text-sm">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <div className="mb-8 flex items-center gap-6 text-sm text-white/90">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
             <span>{location}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
             <span>{date}</span>
           </div>
         </div>
@@ -69,10 +69,10 @@ export function EventCard({
         {/* Button */}
         <Button
           onClick={onClick}
-          className="h-11 rounded-xl bg-[#F3E7D7] text-sm font-semibold text-[#B98B4A] hover:bg-[#F3E7D7]/90 sm:h-14 sm:rounded-2xl sm:text-lg"
+          className="h-14 rounded-2xl bg-[#F3E7D7] text-lg font-semibold text-[#B98B4A] hover:bg-[#F3E7D7]/90"
         >
           {t('label.view_details')}
-          {isRtl ? <ArrowLeft className="ml-2 h-4 w-4 sm:h-5 sm:w-5" /> : <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />}
+          {isRtl ? <ArrowLeft className="ml-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
         </Button>
       </div>
     </div>

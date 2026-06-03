@@ -13,19 +13,19 @@ const HomeEvents = () => {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <h1 className="mb-4 scroll-m-20 text-2xl font-extrabold text-primary sm:mb-6 sm:text-3xl md:text-4xl">
+        <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold text-primary">
           {i18n.t('events')}
         </h1>
         <p
-          className="scroll-m-20 font-heading text-sm text-secondary-5 cursor-pointer flex items-center sm:text-base"
+          className="scroll-m-20 font-heading text-secondary-5 cursor-pointer flex items-center"
           onClick={() => console.log('clicked')}
         >
           {i18n.t('label.view_all')}
-          {isRtl ? <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" /> : <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />}
+          {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </p>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {EVENTS_DATA.map((event) => (
           <EventCard
             key={event.id}
