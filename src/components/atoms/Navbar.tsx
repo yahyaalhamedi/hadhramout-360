@@ -1,7 +1,7 @@
 import hadhramoutAR from '@/assets/hadhramoutAR.svg'
 import hadhramoutEN from '@/assets/hadhramoutEN.svg'
 import { Globe, CircleUserRound } from 'lucide-react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,6 +13,7 @@ import {
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { useGetRtl } from '@/lib/utils'
+import UserProfilePopover from './UserProfilePopover'
 
 const content: { title: string; href: string }[] = [
   { title: 'home', href: '/' },
@@ -54,8 +55,13 @@ const NavMenuItem = ({ title, href }: { title: string; href: string }) => {
 
 const Navbar = () => {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const isRtl = useGetRtl()
   const logo = isRtl ? hadhramoutAR : hadhramoutEN
+
+  const isLoggedIn = localStorage.getItem('LoggedIn') === 'true'
+  const userName = localStorage.getItem('user_name') || ''
+  const userEmail = localStorage.getItem('user_email') || ''
 
   const toggleLanguage = () => {
     void i18n.changeLanguage(isRtl ? 'en' : 'ar')
@@ -95,12 +101,36 @@ const Navbar = () => {
             </div>
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-          >
-            <CircleUserRound />
-          </Button>
+          {isLoggedIn ? (
+            <div className="relative group py-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="cursor-pointer"
+              >
+                <CircleUserRound className="text-[#0a5c66] h-6 w-6" />
+              </Button>
+              {/* Fade-in transform Popover container */}
+              <div className="absolute right-0 top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                <UserProfilePopover
+                  userName={userName}
+                  userEmail={userEmail}
+                  onLogoutSuccess={() => {
+                    // Navigate to trigger route update and navbar re-render
+                    navigate('/')
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/auth?mode=login')}
+            >
+              <CircleUserRound />
+            </Button>
+          )}
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

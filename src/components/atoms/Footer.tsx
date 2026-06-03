@@ -4,6 +4,7 @@ import { Camera, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import { useGetRtl } from '@/lib/utils'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   const { t } = useTranslation()
@@ -54,12 +55,12 @@ export default function Footer() {
               {t('footer.about')}
             </a>
 
-            <a
-              href="#"
+            <Link
+              to="/auth?mode=register-org"
               className="transition-colors hover:text-primary"
             >
               {t('footer.signup_org')}
-            </a>
+            </Link>
 
             <a
               href="#"

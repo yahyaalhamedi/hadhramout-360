@@ -7,6 +7,7 @@ import LandmarkDetail from './Pages/landmarks/LandmarkDetail'
 import Events from './Pages/events/Events'
 import EventDetail from './Pages/events/EventDetail'
 import ScrollToTop from './components/atoms/ScrollToTop'
+import AuthPage from './Pages/auth/AuthPage'
 
 function App() {
   return (
@@ -34,6 +35,10 @@ function App() {
         <Route
           path="/events/:slug"
           element={<EventDetail />}
+        />
+        <Route
+          path="/auth"
+          element={<AuthPage />}
         />
         <Route
           path="/artisans"
