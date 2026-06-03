@@ -7,12 +7,15 @@ import './styles/font.css'
 import './i18n'
 import App from './App.tsx'
 import { queryClient } from './api/queryClient'
+import { AuthProvider } from './lib/AuthContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

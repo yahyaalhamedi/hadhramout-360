@@ -13,6 +13,7 @@ import {
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { useGetRtl } from '@/lib/utils'
+import { useAuthContext } from '@/lib/AuthContext'
 import UserProfilePopover from './UserProfilePopover'
 
 const content: { title: string; href: string }[] = [
@@ -59,9 +60,7 @@ const Navbar = () => {
   const isRtl = useGetRtl()
   const logo = isRtl ? hadhramoutAR : hadhramoutEN
 
-  const isLoggedIn = localStorage.getItem('LoggedIn') === 'true'
-  const userName = localStorage.getItem('user_name') || ''
-  const userEmail = localStorage.getItem('user_email') || ''
+  const { isLoggedIn, userName, userEmail, roles, isAdmin } = useAuthContext()
 
   const toggleLanguage = () => {
     void i18n.changeLanguage(isRtl ? 'en' : 'ar')
@@ -115,8 +114,9 @@ const Navbar = () => {
                 <UserProfilePopover
                   userName={userName}
                   userEmail={userEmail}
+                  isAdmin={isAdmin}
+                  roles={roles}
                   onLogoutSuccess={() => {
-                    // Navigate to trigger route update and navbar re-render
                     navigate('/')
                   }}
                 />

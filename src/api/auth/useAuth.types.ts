@@ -5,17 +5,15 @@ export interface LoginParams {
 
 export interface LoginResponseData {
   token: string
-  userName: string
+  expiration: string
   email: string
-  roles?: string[]
+  roles: string[]
+  userId: number
 }
 
 export interface LoginResponse {
-  success: boolean
-  message: string | null
+  message: string
   data: LoginResponseData
-  errors: string[] | null
-  statusCode: number
 }
 
 export interface RegisterUserParams {

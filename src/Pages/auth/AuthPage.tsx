@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2 } from 'lucide-react'
 import { useLogin, useRegisterUser, useRegisterOrganization } from '@/api/auth/useAuth'
+import { useAuthContext } from '@/lib/AuthContext'
 import { useGetRtl } from '@/lib/utils'
 import type { LoginParams } from '@/api/auth/useAuth.types'
 
@@ -29,6 +30,8 @@ export default function AuthPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const mode = searchParams.get('mode') || 'login' // 'login' | 'register' | 'register-org'
 
+  const { isLoggedIn } = useAuthContext()
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
@@ -36,6 +39,11 @@ export default function AuthPage() {
   const { mutate: loginMutation, isPending: loginIsPending } = useLogin()
   const { mutate: registerUserMutation, isPending: registerUserIsPending } = useRegisterUser()
   const { mutate: registerOrgMutation, isPending: registerOrgIsPending } = useRegisterOrganization()
+
+  // ── Redirect if already logged in ────────────────────────────────
+  if (isLoggedIn) {
+    return <Navigate to="/" replace />
+  }
 
   // ── 1. Handle Login Submit ──────────────────────────────────────
   const onLoginSubmit = (data: LoginParams, reset: () => void) => {

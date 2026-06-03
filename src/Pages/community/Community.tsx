@@ -4,12 +4,14 @@ import PostCard from '@/components/atoms/PostCard'
 import CreatePostForm from '@/components/atoms/CreatePostForm'
 import { useTranslation } from 'react-i18next'
 import { useCommunityPosts, useReportPost } from '@/api/community/useCommunityPosts'
+import { useAuthContext } from '@/lib/AuthContext'
 
 const Community = () => {
   const { t } = useTranslation()
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const userName = localStorage.getItem('user_name') || 'User'
+  const { userName } = useAuthContext()
+  const displayName = userName || 'User'
 
   const { data, fetchNextPage, hasNextPage, isFetching, isError } = useCommunityPosts({
     pageSize: 5,
@@ -38,7 +40,7 @@ const Community = () => {
             <div className="lg:sticky lg:top-24 space-y-6">
               {/* Create Post Form */}
               <CreatePostForm
-                userName={userName}
+                userName={displayName}
                 userAvatar={null}
                 onPostCreated={() => setRefreshKey((k) => k + 1)}
               />
