@@ -61,6 +61,22 @@
   "event.no_results": "No events found",
 
   "artisan.no_results": "No artisans found",
+  "artisan.not_found": "Artisan not found",
+  "artisan.back": "Back to Artisans",
+  "artisan.no_description": "No description available.",
+  "artisan.journey.label": "The Artisan's Journey",
+  "artisan.journey.title": "Preserving the Soul of Hadhrami Craft",
+  "artisan.journey.years": "Years of Craft",
+  "artisan.commission.title": "Commission a Piece",
+  "artisan.commission.description": "This artisan accepts a limited number of bespoke commissions each year for private projects and collector's items.",
+  "artisan.commission.call": "Call Workshop",
+  "artisan.commission.message": "Send Message",
+  "artisan.gallery.eyebrow": "Portfolio",
+  "artisan.gallery.heading": "The Master's Gallery",
+  "artisan.community.label": "Community",
+  "artisan.community.title": "Masters of Other Crafts",
+  "artisan.community.card_label": "Artisan",
+  "artisan.community.card_description": "A skilled craftsperson preserving traditional Hadhrami arts.",
 
   "discover.no_results": "No places found",
 

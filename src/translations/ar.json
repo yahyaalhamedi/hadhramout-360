@@ -61,6 +61,22 @@
   "event.no_results": "لا توجد فعاليات",
 
   "artisan.no_results": "لا يوجد حرفيين",
+  "artisan.not_found": "الحرفي غير موجود",
+  "artisan.back": "العودة إلى الحرفيين",
+  "artisan.no_description": "لا يوجد وصف متاح.",
+  "artisan.journey.label": "رحلة الحرفي",
+  "artisan.journey.title": "الحفاظ على جوهر الحرف الحضرمية",
+  "artisan.journey.years": "سنوات من الحرف",
+  "artisan.commission.title": "اطلب قطعة مخصصة",
+  "artisan.commission.description": "يقبل هذا الحرفي عددًا محدودًا من الطلبات الخاصة كل عام للمشاريع الخاصة وقطع المجموعات.",
+  "artisan.commission.call": "اتصل بالورشة",
+  "artisan.commission.message": "إرسال رسالة",
+  "artisan.gallery.eyebrow": "المعرض",
+  "artisan.gallery.heading": "معرض الفنان",
+  "artisan.community.label": "المجتمع",
+  "artisan.community.title": "فنانون في حرف أخرى",
+  "artisan.community.card_label": "حرفي",
+  "artisan.community.card_description": "حرفي ماهر يحافظ على الفنون الحضرمية التقليدية.",
 
   "discover.no_results": "لا توجد أماكن",
 

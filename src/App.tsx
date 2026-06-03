@@ -9,6 +9,7 @@ import EventDetail from './Pages/events/EventDetail'
 import ScrollToTop from './components/atoms/ScrollToTop'
 import AuthPage from './Pages/auth/AuthPage'
 import Artisans from './Pages/artisans/Artisans'
+import ArtisanDetail from './Pages/artisans/ArtisanDetail'
 import Discover from './Pages/discover/Discover'
 import Community from './Pages/community/Community'
 
@@ -46,6 +47,10 @@ function App() {
         <Route
           path="/artisans"
           element={<Artisans />}
+        />
+        <Route
+          path="/artisans/:slug"
+          element={<ArtisanDetail />}
         />
         <Route
           path="/discover"
