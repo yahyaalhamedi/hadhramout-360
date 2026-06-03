@@ -16,6 +16,7 @@
   "label.active_filters": "Active Filters:",
   "label.clear_filters": "Clear Filters",
   "label.no_results": "No results found",
+  "label.all": "All",
   "label.adjust_search": "Try adjusting your search or filters.",
   "label.adjust_search_simple": "Try adjusting your search.",
   "label.register_now": "Register Now",
@@ -30,6 +31,10 @@
   "hero.landmarks.en": "Timeless Landmarks",
   "hero.events.ar": "فعاليات حيّة",
   "hero.events.en": "Vibrant Events",
+  "hero.artisans.ar": "حرفيون مبدعون",
+  "hero.artisans.en": "Master Artisans",
+  "hero.discover.ar": "اكشف حضرموت",
+  "hero.discover.en": "Discover Hadhramout",
 
   "landmark.not_found": "Landmark not found",
   "landmark.back": "Back to Landmarks",
@@ -54,6 +59,28 @@
   "event.gallery.heading": "Moments from",
   "event.map.title": "Event location map",
   "event.no_results": "No events found",
+
+  "artisan.no_results": "No artisans found",
+
+  "discover.no_results": "No places found",
+
+  "community.hi": "Hi,",
+  "community.post_content": "POST CONTENT",
+  "community.placeholder": "Describe the atmosphere, the colors, the history...",
+  "community.publish": "Publish Post",
+  "community.posting": "Publishing...",
+  "community.view_all_posts": "view all post",
+  "community.no_posts": "No posts yet",
+  "community.be_first": "Be the first to share something!",
+  "community.report_prompt": "Why are you reporting this post?",
+  "label.report": "REPORT",
+  "label.cancel": "Cancel",
+
+  "time.just_now": "just now",
+  "time.minutes_ago": "MINUTES AGO",
+  "time.hours_ago": "HOURS AGO",
+  "time.yesterday": "YESTERDAY",
+  "time.days_ago": "DAYS AGO",
 
   "footer.tagline": "Preserving and promoting the breathtaking cultural heritage of Hadhramout for a global audience.",
   "footer.quick_links": "Quick Links",

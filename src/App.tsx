@@ -8,6 +8,9 @@ import Events from './Pages/events/Events'
 import EventDetail from './Pages/events/EventDetail'
 import ScrollToTop from './components/atoms/ScrollToTop'
 import AuthPage from './Pages/auth/AuthPage'
+import Artisans from './Pages/artisans/Artisans'
+import Discover from './Pages/discover/Discover'
+import Community from './Pages/community/Community'
 
 function App() {
   return (
@@ -42,15 +45,15 @@ function App() {
         />
         <Route
           path="/artisans"
-          element={<div>Artisans</div>}
+          element={<Artisans />}
         />
         <Route
           path="/discover"
-          element={<div>Discover</div>}
+          element={<Discover />}
         />
         <Route
           path="/community"
-          element={<div>Community</div>}
+          element={<Community />}
         />
       </Routes>
       {/* </main> */}

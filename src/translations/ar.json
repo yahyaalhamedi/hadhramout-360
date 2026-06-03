@@ -16,6 +16,7 @@
   "label.active_filters": "الفلاتر النشطة:",
   "label.clear_filters": "مسح الفلاتر",
   "label.no_results": "لا توجد نتائج",
+  "label.all": "الكل",
   "label.adjust_search": "حاول تعديل البحث أو الفلاتر.",
   "label.adjust_search_simple": "حاول تعديل البحث.",
   "label.register_now": "سجّل الآن",
@@ -30,6 +31,10 @@
   "hero.landmarks.en": "Timeless Landmarks",
   "hero.events.ar": "فعاليات حيّة",
   "hero.events.en": "Vibrant Events",
+  "hero.artisans.ar": "حرفيون مبدعون",
+  "hero.artisans.en": "Master Artisans",
+  "hero.discover.ar": "اكشف حضرموت",
+  "hero.discover.en": "Discover Hadhramout",
 
   "landmark.not_found": "المعلم غير موجود",
   "landmark.back": "العودة إلى المعالم",
@@ -54,6 +59,28 @@
   "event.gallery.heading": "لحظات من",
   "event.map.title": "خريطة موقع الفعالية",
   "event.no_results": "لا توجد فعاليات",
+
+  "artisan.no_results": "لا يوجد حرفيين",
+
+  "discover.no_results": "لا توجد أماكن",
+
+  "community.hi": "مرحباً،",
+  "community.post_content": "محتوى المنشور",
+  "community.placeholder": "صف الجو والألوان والتاريخ...",
+  "community.publish": "نشر المنشور",
+  "community.posting": "جاري النشر...",
+  "community.view_all_posts": "عرض جميع المنشورات",
+  "community.no_posts": "لا توجد منشورات بعد",
+  "community.be_first": "كن أول من يشارك شيئاً!",
+  "community.report_prompt": "لماذا تبلغ عن هذا المنشور؟",
+  "label.report": "إبلاغ",
+  "label.cancel": "إلغاء",
+
+  "time.just_now": "الآن",
+  "time.minutes_ago": "دقائق مضت",
+  "time.hours_ago": "ساعات مضت",
+  "time.yesterday": "أمس",
+  "time.days_ago": "أيام مضت",
 
   "footer.tagline": "نحافظ على التراث الثقافي الرائع لحضرموت ونروّج له لجمهور عالمي.",
   "footer.quick_links": "روابط سريعة",
