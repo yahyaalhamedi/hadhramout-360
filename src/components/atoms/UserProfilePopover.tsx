@@ -80,7 +80,7 @@ export default function UserProfilePopover({
         {/* Dashboard — Admin & ContentManager */}
         {showDashboard && (
           <button
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate('/dashboard')}
             className="w-full h-12 rounded-2xl bg-[#0a5c66] hover:bg-[#084f57] text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors duration-200"
           >
             <Shield className="h-4 w-4" />

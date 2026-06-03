@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/atoms/Navbar'
 import Home from './Pages/home/Home'
 import Footer from './components/atoms/Footer'
@@ -13,13 +13,18 @@ import ArtisanDetail from './Pages/artisans/ArtisanDetail'
 import Discover from './Pages/discover/Discover'
 import DiscoverDetail from './Pages/discover/DiscoverDetail'
 import Community from './Pages/community/Community'
+import Dashboard from './Pages/dashboard/Dashboard'
+import ProtectedRoute from './components/atoms/ProtectedRoute'
+import { Roles } from './lib/roles'
 
 function App() {
+  const location = useLocation()
+  const isDashboard = location.pathname.startsWith('/dashboard')
+
   return (
     <div className="flex flex-col">
       <ScrollToTop />
-      <Navbar />
-      {/* <main className="mx-auto flex w-full flex-1 flex-col items-center"> */}
+      {!isDashboard && <Navbar />}
       <Routes>
         <Route
           path="/"
@@ -65,9 +70,16 @@ function App() {
           path="/community"
           element={<Community />}
         />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requiredRoles={[Roles.Admin, Roles.ContentManager]}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-      {/* </main> */}
-      <Footer />
+      {!isDashboard && <Footer />}
     </div>
   )
 }
