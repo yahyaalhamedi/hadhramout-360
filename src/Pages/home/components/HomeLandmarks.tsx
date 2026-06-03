@@ -19,33 +19,33 @@ const HomeLandmarks = () => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold text-primary">
+        <h1 className="mb-4 scroll-m-20 text-2xl font-extrabold text-primary sm:mb-6 sm:text-3xl md:text-4xl">
           {i18n.t('landmarks')}
         </h1>
         <p
-          className="flex cursor-pointer scroll-m-20 items-center font-heading text-secondary-5"
+          className="flex cursor-pointer scroll-m-20 items-center font-heading text-sm text-secondary-5 sm:text-base"
           onClick={() => navigate('/landmarks')}
         >
           {i18n.t('label.view_all')}
-          {isRtl ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+          {isRtl ? <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" /> : <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />}
         </p>
       </div>
 
       {isError && <p className="text-destructive py-4">{t('label.error_loading')}</p>}
 
       {isLoading && (
-        <div className="flex gap-6 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 sm:gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-[400px] min-w-[380px] shrink-0 animate-pulse rounded-[32px] bg-muted"
+              className="h-[280px] min-w-[260px] shrink-0 animate-pulse rounded-[24px] bg-muted sm:h-[340px] sm:min-w-[320px] sm:rounded-[28px] md:h-[400px] md:min-w-[380px] md:rounded-[32px]"
             />
           ))}
         </div>
       )}
 
       {!isLoading && (
-        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="scrollbar-hide -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 sm:-mx-0 sm:gap-6 sm:px-0 snap-x snap-mandatory">
           {items.map((landmark) => {
             const title = isRtl ? landmark.titleAr : landmark.titleEn
             const location = isRtl ? landmark.locationTextAr : landmark.locationTextEn
@@ -53,7 +53,7 @@ const HomeLandmarks = () => {
             return (
               <div
                 key={landmark.landmarkId}
-                className="min-w-[380px] shrink-0"
+                className="min-w-[260px] shrink-0 snap-start sm:min-w-[320px] md:min-w-[380px]"
               >
                 <SharedCard
                   imageUrl={landmark.coverMediaUrl || ''}
@@ -66,7 +66,7 @@ const HomeLandmarks = () => {
                       state: { from: '/', label: t('landmarks') },
                     })
                   }
-                  className="h-[400px] w-fit"
+                  className="h-[280px] w-full sm:h-[340px] md:h-[400px]"
                 />
               </div>
             )
