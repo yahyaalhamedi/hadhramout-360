@@ -47,6 +47,19 @@ async function createPost(payload: {
   return data
 }
 
+async function updatePost(payload: {
+  postId: number
+  contentText: string
+}): Promise<void> {
+  await axiosInstance.put(`/api/community-posts/${payload.postId}`, {
+    contentText: payload.contentText,
+  })
+}
+
+async function deletePost(postId: number): Promise<void> {
+  await axiosInstance.delete(`/api/community-posts/${postId}`)
+}
+
 async function reportPost(payload: { postId: number; reason: string }): Promise<ReportResponseDtoApiResponse> {
   const { data } = await axiosInstance.post<ReportResponseDtoApiResponse>(
     `/api/community-posts/${payload.postId}/report`,
@@ -79,8 +92,33 @@ export function useCreatePost() {
   })
 }
 
+export function useUpdatePost() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: updatePost,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['community-posts'] })
+      void queryClient.invalidateQueries({ queryKey: ['user-posts'] })
+    },
+  })
+}
+
+export function useDeletePost() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['community-posts'] })
+      void queryClient.invalidateQueries({ queryKey: ['user-posts'] })
+    },
+  })
+}
+
 export function useReportPost() {
   return useMutation({
     mutationFn: reportPost,
   })
 }
+

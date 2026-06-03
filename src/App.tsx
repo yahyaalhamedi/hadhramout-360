@@ -14,6 +14,8 @@ import Discover from './Pages/discover/Discover'
 import DiscoverDetail from './Pages/discover/DiscoverDetail'
 import Community from './Pages/community/Community'
 import Dashboard from './Pages/dashboard/Dashboard'
+import Posts from './Pages/posts/Posts'
+import Favorites from './Pages/favorites/Favorites'
 import ProtectedRoute from './components/atoms/ProtectedRoute'
 import { Roles } from './lib/roles'
 
@@ -75,6 +77,22 @@ function App() {
           element={
             <ProtectedRoute requiredRoles={[Roles.Admin, Roles.ContentManager]}>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/posts"
+          element={
+            <ProtectedRoute>
+              <Posts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <Favorites />
             </ProtectedRoute>
           }
         />

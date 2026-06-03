@@ -94,6 +94,15 @@
   "community.report_prompt": "Why are you reporting this post?",
   "label.report": "REPORT",
   "label.cancel": "Cancel",
+  "label.load_more": "Load More",
+
+  "post.edit": "Edit Post",
+  "post.delete": "Delete Post",
+  "post.save": "Save",
+  "post.saving": "Saving...",
+  "post.deleting": "Deleting...",
+  "post.delete_confirm": "Are you sure you want to delete this post?",
+  "post.delete_warning": "This action cannot be undone.",
 
   "time.just_now": "just now",
   "time.minutes_ago": "MINUTES AGO",

@@ -3,14 +3,19 @@ import InfiniteScroll from 'react-infinite-scroller'
 import PostCard from '@/components/atoms/PostCard'
 import CreatePostForm from '@/components/atoms/CreatePostForm'
 import { useTranslation } from 'react-i18next'
-import { useCommunityPosts, useReportPost } from '@/api/community/useCommunityPosts'
+import {
+  useCommunityPosts,
+  useReportPost,
+  useUpdatePost,
+  useDeletePost,
+} from '@/api/community/useCommunityPosts'
 import { useAuthContext } from '@/lib/AuthContext'
 
 const Community = () => {
   const { t } = useTranslation()
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const { userName } = useAuthContext()
+  const { userName, userId } = useAuthContext()
   const displayName = userName || 'User'
 
   const { data, fetchNextPage, hasNextPage, isFetching, isError } = useCommunityPosts({
@@ -18,6 +23,8 @@ const Community = () => {
   })
 
   const { mutate: reportPost } = useReportPost()
+  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost()
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost()
 
   const items = data?.pages.flatMap((p) => p.items) ?? []
 
@@ -29,6 +36,20 @@ const Community = () => {
       }
     },
     [reportPost, t],
+  )
+
+  const handleEdit = useCallback(
+    (postId: number, newContent: string) => {
+      updatePost({ postId, contentText: newContent })
+    },
+    [updatePost],
+  )
+
+  const handleDelete = useCallback(
+    (postId: number) => {
+      deletePost(postId)
+    },
+    [deletePost],
   )
 
   return (
@@ -80,12 +101,19 @@ const Community = () => {
                 {items.map((post) => (
                   <PostCard
                     key={post.postId}
+                    postId={post.postId}
                     userName={post.user.userName || 'Unknown'}
                     userAvatar={post.user.profileImageUrl}
                     contentText={post.contentText}
                     createdAt={post.createdAt}
                     media={post.media}
+                    postUserId={post.user.userId}
+                    currentUserId={userId}
                     onReport={() => handleReport(post.postId)}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    isUpdating={isUpdating}
+                    isDeleting={isDeleting}
                   />
                 ))}
               </div>

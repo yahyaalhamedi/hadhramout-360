@@ -22,4 +22,13 @@ export default defineConfig({
     //   },
     // }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://had360.runasp.net',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

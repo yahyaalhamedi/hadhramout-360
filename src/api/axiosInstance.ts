@@ -1,10 +1,16 @@
 import axios from 'axios'
 import { clearAuthCookies } from '@/lib/auth'
 
+// Full backend origin — used only for <img> src attributes (no CORS issue).
 export const baseURL = 'http://had360.runasp.net'
 
+// API calls use a relative path so they go through Vite's dev-server proxy,
+// which eliminates CORS entirely. In production builds, set VITE_API_BASE_URL
+// to the real backend origin (e.g. 'http://had360.runasp.net').
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+
 export const axiosInstance = axios.create({
-  baseURL: baseURL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

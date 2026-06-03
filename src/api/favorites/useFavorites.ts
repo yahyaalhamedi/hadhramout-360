@@ -78,9 +78,10 @@ export function useToggleFavorite() {
   return useMutation({
     mutationFn: toggleFavorite,
     onSuccess: (_isFavorite, landmarkId) => {
-      // Invalidate both the landmarks list and the specific landmark details
+      // Invalidate the landmarks list, specific landmark details, and user favorites
       void queryClient.invalidateQueries({ queryKey: ['landmarks'] })
       void queryClient.invalidateQueries({ queryKey: ['landmark', landmarkId] })
+      void queryClient.invalidateQueries({ queryKey: ['user-favorites'] })
     },
   })
 }

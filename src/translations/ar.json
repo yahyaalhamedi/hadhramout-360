@@ -94,6 +94,15 @@
   "community.report_prompt": "لماذا تبلغ عن هذا المنشور؟",
   "label.report": "إبلاغ",
   "label.cancel": "إلغاء",
+  "label.load_more": "تحميل المزيد",
+
+  "post.edit": "تعديل المنشور",
+  "post.delete": "حذف المنشور",
+  "post.save": "حفظ",
+  "post.saving": "جاري الحفظ...",
+  "post.deleting": "جاري الحذف...",
+  "post.delete_confirm": "هل أنت متأكد من حذف هذا المنشور؟",
+  "post.delete_warning": "لا يمكن التراجع عن هذا الإجراء.",
 
   "time.just_now": "الآن",
   "time.minutes_ago": "دقائق مضت",
