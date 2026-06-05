@@ -55,7 +55,7 @@ function App() {
           element={<Events />}
         />
         <Route
-          path="/events/:slug"
+          path="/events/:id"
           element={<EventDetail />}
         />
         <Route

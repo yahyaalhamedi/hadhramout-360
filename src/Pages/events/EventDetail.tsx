@@ -1,23 +1,43 @@
 import { useParams } from 'react-router-dom'
-import { Calendar, MapPin, Ticket, ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Calendar, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useGetRtl } from '@/lib/utils'
+import { useEvent } from '@/api/events/useEvents'
+import { baseURL } from '@/api/axiosInstance'
 import {
   DetailHero,
   DetailInfoRow,
   DetailGallery,
   DetailNotFound,
 } from '@/components/atoms/DetailComponents'
-import { EVENTS_DATA } from './data'
+import MapCard from '@/components/atoms/MapCard'
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1600&q=80'
 
 const EventDetail = () => {
-  const { slug } = useParams<{ slug: string }>()
+  const { id: idParam } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const isRtl = useGetRtl()
 
-  const event = EVENTS_DATA.find((e) => e.slug === slug)
+  const id = idParam ? Number(idParam) : undefined
 
-  if (!event) {
+  const { data: event, isLoading, isError } = useEvent(id)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background animate-pulse">
+        <div className="h-[55vh] min-h-[400px] w-full bg-muted" />
+        <div className="mx-auto max-w-6xl px-4 py-12 md:px-8 space-y-4">
+          <div className="h-8 w-1/2 rounded-xl bg-muted" />
+          <div className="h-4 w-full rounded-xl bg-muted" />
+          <div className="h-4 w-3/4 rounded-xl bg-muted" />
+        </div>
+      </div>
+    )
+  }
+
+  if (isError || !event) {
     return (
       <DetailNotFound
         icon={Calendar}
@@ -27,46 +47,54 @@ const EventDetail = () => {
     )
   }
 
-  const mapsUrl = `https://www.google.com/maps?q=${event.mapLat},${event.mapLng}`
-  // const osmMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${event.mapLng - 0.05},${event.mapLat - 0.05},${event.mapLng + 0.05},${event.mapLat + 0.05}&layer=mapnik&marker=${event.mapLat},${event.mapLng}`
-  const osmMapUrl = 'https://maps.google.com/?q=24.6310,46.7136'
+  const title = isRtl ? event.titleAr : event.titleEn
+  const description = isRtl ? event.descriptionAr : event.descriptionEn
+  const address = isRtl ? event.addressAr : event.addressEn
+  const orgName = isRtl ? event.organization.orgNameAr : event.organization.orgNameEn
+
+  const coverUrl = event.media?.[0]?.mediaUrl
+    ? `${baseURL}${event.media[0].mediaUrl}`
+    : FALLBACK_IMAGE
+
+  const galleryImages = (event.media ?? []).map((m) => ({
+    url: m.mediaUrl ? `${baseURL}${m.mediaUrl}` : FALLBACK_IMAGE,
+    alt: title ?? '',
+  }))
+
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString(isRtl ? 'ar-YE' : 'en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+
+  const dateRange = `${formatDate(event.startDate)} – ${formatDate(event.endDate)}`
 
   return (
     <div className="min-h-screen bg-background">
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <DetailHero
-        imageUrl={event.imageUrl}
-        imageAlt={event.title}
+        imageUrl={coverUrl}
+        imageAlt={title || ''}
       >
-        {/* Tag chip */}
-        <span className="mb-3 inline-block rounded-full bg-secondary-8/90 px-3 py-1 text-xs font-semibold text-secondary-1 backdrop-blur-sm">
-          {event.tag}
-        </span>
-
         {/* Title */}
         <h1 className="max-w-2xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
-          {event.title}
+          {title}
         </h1>
 
         {/* Meta row */}
         <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
           <span className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4" />
-            {event.dateRange}
+            {dateRange}
           </span>
-          <span className="flex items-center gap-1.5">
-            <MapPin className="h-4 w-4" />
-            {event.venue}, {event.location}
-          </span>
+          {address && (
+            <span className="flex items-center gap-1.5">
+              <MapPin className="h-4 w-4" />
+              {address}
+            </span>
+          )}
         </div>
-
-        {/* CTA */}
-        <Button
-          onClick={() => window.open(mapsUrl, '_blank')}
-          className="mt-5 rounded-full bg-primary-7 px-7 text-white hover:bg-primary-8"
-        >
-          {t('label.register_now')}
-        </Button>
       </DetailHero>
 
       {/* ── Body ─────────────────────────────────────────────────── */}
@@ -75,30 +103,35 @@ const EventDetail = () => {
           {/* Left — article */}
           <article className="lg:col-span-2 space-y-6">
             {/* Author */}
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 border border-border">
-                <AvatarImage src={event.authorImage} />
-              </Avatar>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  {t('label.hosted_by')}
-                </p>
-                <p className="text-sm font-medium text-foreground">{event.authorName}</p>
+            {orgName && (
+              <div className="flex items-center gap-3">
+                {event.organization.logoUrl && (
+                  <img
+                    src={`${baseURL}${event.organization.logoUrl}`}
+                    alt={orgName}
+                    className="h-10 w-10 rounded-full border border-border object-cover"
+                  />
+                )}
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    {t('label.hosted_by')}
+                  </p>
+                  <p className="text-sm font-medium text-foreground">{orgName}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             <h2 className="text-2xl font-bold text-foreground">
-              {event.title.split(' ').slice(0, 4).join(' ')}
+              {title}
             </h2>
 
-            {event.description.map((para, i) => (
-              <p
-                key={i}
-                className="leading-relaxed text-muted-foreground"
-              >
-                {para}
+            {description ? (
+              <p className="leading-relaxed text-muted-foreground">{description}</p>
+            ) : (
+              <p className="leading-relaxed text-muted-foreground/50 italic">
+                {t('event.no_description', 'No description available.')}
               </p>
-            ))}
+            )}
           </article>
 
           {/* Right — sidebar */}
@@ -112,46 +145,29 @@ const EventDetail = () => {
               <DetailInfoRow
                 icon={Calendar}
                 label={t('event.sidebar.dates')}
-                value={event.dateRange}
-              />
-              <DetailInfoRow
-                icon={Ticket}
-                label={t('event.sidebar.admission')}
-                value={event.admission}
+                value={dateRange}
               />
             </div>
 
             {/* Map card */}
-            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              <iframe
-                title={t('event.map.title')}
-                src={osmMapUrl}
-                className="h-48 w-full border-0"
-                loading="lazy"
+            {event.mapUrl && (
+              <MapCard
+                mapUrl={event.mapUrl}
+                venue={title || ''}
+                venueDetail={address || undefined}
               />
-              <div className="px-4 py-3">
-                <p className="text-sm font-semibold text-foreground">{event.venue}</p>
-                <p className="text-xs text-muted-foreground">{event.venueDetail}</p>
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  {t('label.open_in_maps')}
-                </a>
-              </div>
-            </div>
+            )}
           </aside>
         </div>
 
         {/* ── Photo Gallery ──────────────────────────────────────── */}
-        <DetailGallery
-          eyebrow={t('event.gallery.eyebrow')}
-          heading={`${t('event.gallery.heading')} ${event.location.split(',')[0]}`}
-          images={event.gallery}
-        />
+        {galleryImages.length > 0 && (
+          <DetailGallery
+            eyebrow={t('event.gallery.eyebrow')}
+            heading={`${t('event.gallery.heading')} ${address?.split(',')[0] ?? ''}`}
+            images={galleryImages}
+          />
+        )}
       </div>
     </div>
   )

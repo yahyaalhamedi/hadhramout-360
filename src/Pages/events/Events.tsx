@@ -1,25 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useGetRtl } from '@/lib/utils'
 import { EventCard } from '@/components/atoms/EventCard'
-import { EVENTS_DATA } from './data'
+import { useEvents } from '@/api/events/useEvents'
+import { baseURL } from '@/api/axiosInstance'
+import InfiniteScroll from 'react-infinite-scroller'
 
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1600&q=80'
 
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80'
+
 const Events = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const isRtl = useGetRtl()
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  const filteredEvents = EVENTS_DATA.filter(
-    (e) =>
-      searchTerm === '' ||
-      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.location.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const { data, fetchNextPage, hasNextPage, isFetching, isError } = useEvents({
+    pageSize: 9,
+    search: debouncedSearch || undefined,
+  })
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const items = data?.pages.flatMap((p) => p.items) ?? []
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,32 +82,67 @@ const Events = () => {
 
       {/* ── Event Grid ───────────────────────────────────────────── */}
       <div className="mt-16 px-4 pb-12">
-        {filteredEvents.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                imageUrl={event.imageUrl}
-                author={event.authorName}
-                authorImage={event.authorImage}
-                title={event.title}
-                location={event.location}
-                date={event.date}
-                onClick={() =>
-                  navigate(`/events/${event.slug}`, {
-                    state: { from: '/events', label: t('events') },
-                  })
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
-            <Search className="h-12 w-12 opacity-30" />
-            <p className="text-lg font-medium">{t('event.no_results')}</p>
-            <p className="text-sm">{t('label.adjust_search_simple')}</p>
-          </div>
-        )}
+        {isError && <p className="mt-8 text-destructive">{t('label.no_results')}</p>}
+
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={() => {
+            if (!isFetching) void fetchNextPage()
+          }}
+          hasMore={!!hasNextPage}
+          loader={
+            <div key="loader" className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[520px] animate-pulse rounded-[40px] bg-muted"
+                />
+              ))}
+            </div>
+          }
+        >
+          {items.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((event) => {
+                const title = isRtl ? event.titleAr : event.titleEn
+                const address = isRtl ? event.addressAr : event.addressEn
+                const orgName = isRtl ? event.organizationNameAr : event.organizationNameEn
+                const coverUrl = event.coverImageUrl
+                  ? `${baseURL}${event.coverImageUrl}`
+                  : FALLBACK_IMAGE
+                const startDate = new Date(event.startDate).toLocaleDateString(
+                  isRtl ? 'ar-YE' : 'en-US',
+                  { year: 'numeric', month: 'long', day: 'numeric' },
+                )
+
+                return (
+                  <EventCard
+                    key={event.eventId}
+                    imageUrl={coverUrl}
+                    author={orgName || ''}
+                    authorImage={event.organizationLogoUrl ? `${baseURL}${event.organizationLogoUrl}` : ''}
+                    title={title || ''}
+                    location={address || ''}
+                    date={startDate}
+                    onClick={() =>
+                      navigate(`/events/${event.eventId}`, {
+                        state: { from: '/events', label: t('events') },
+                      })
+                    }
+                  />
+                )
+              })}
+            </div>
+          ) : (
+            !isFetching && (
+              <div className="flex flex-col items-center justify-center py-24 text-center text-muted-foreground gap-3">
+                <Search className="h-12 w-12 opacity-30" />
+                <p className="text-lg font-medium">{t('event.no_results')}</p>
+                <p className="text-sm">{t('label.adjust_search_simple')}</p>
+              </div>
+            )
+          )}
+        </InfiniteScroll>
       </div>
     </div>
   )
