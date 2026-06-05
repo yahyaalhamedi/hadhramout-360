@@ -21,6 +21,9 @@ import DashboardLandmarks from './Pages/dashboard/DashboardLandmarks'
 import DashboardEvents from './Pages/dashboard/DashboardEvents'
 import DashboardArtisans from './Pages/dashboard/DashboardArtisans'
 import DashboardDiscover from './Pages/dashboard/DashboardDiscover'
+import OrgPanelLayout from './Pages/org-panel/OrgPanelLayout'
+import OrgProfile from './Pages/org-panel/OrgProfile'
+import OrgEvents from './Pages/org-panel/OrgEvents'
 import Posts from './Pages/posts/Posts'
 import Favorites from './Pages/favorites/Favorites'
 import ProtectedRoute from './components/atoms/ProtectedRoute'
@@ -28,7 +31,7 @@ import { Roles } from './lib/roles'
 
 function App() {
   const location = useLocation()
-  const isDashboard = location.pathname.startsWith('/dashboard')
+  const isDashboard = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/org-panel')
 
   return (
     <div className="flex flex-col">
@@ -94,6 +97,17 @@ function App() {
           <Route path="events" element={<DashboardEvents />} />
           <Route path="artisans" element={<DashboardArtisans />} />
           <Route path="discover" element={<DashboardDiscover />} />
+        </Route>
+        <Route
+          path="/org-panel"
+          element={
+            <ProtectedRoute requiredRoles={[Roles.Organization]}>
+              <OrgPanelLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<OrgProfile />} />
+          <Route path="events" element={<OrgEvents />} />
         </Route>
         <Route
           path="/posts"
