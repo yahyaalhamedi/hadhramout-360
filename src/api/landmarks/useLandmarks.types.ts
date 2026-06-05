@@ -1,30 +1,26 @@
-// ── Shared ────────────────────────────────────────────────────────
-
 export interface CategoryResponseDto {
   categoryId: number
-  categoryNameAr: string
-  categoryNameEn: string
+  categoryNameAr: string | null
+  categoryNameEn: string | null
 }
 
 export interface LandmarkMediaResponseDto {
   mediaId: number
   mediaUrl: string | null
-  mediaType: 'Image' | 'Video' | string
+  mediaType: number
   createdAt: string
 }
 
-// ── List endpoint ─────────────────────────────────────────────────
-
 export interface LandmarkResponseDto {
   landmarkId: number
-  titleAr: string
-  titleEn: string
-  locationTextAr: string
-  locationTextEn: string
+  titleAr: string | null
+  titleEn: string | null
+  locationTextAr: string | null
+  locationTextEn: string | null
   coverMediaUrl: string | null
-  categories: CategoryResponseDto[]
+  categories: CategoryResponseDto[] | null
   isFavorite: boolean
-  mapUrl: string
+  mapUrl: string | null
   createdAt: string
   updatedAt: string
 }
@@ -48,16 +44,6 @@ export interface LandmarksApiResponse {
   data: LandmarksData
 }
 
-export interface LandmarksParams {
-  search?: string
-  categoryId?: number
-  pageNumber: number
-  pageSize: number
-}
-
-// ── Detail endpoint ───────────────────────────────────────────────
-
-/** Full detail shape returned by GET /api/landmarks/{id} */
 export interface LandmarkDetailsDto {
   landmarkId: number
   titleAr: string | null
@@ -80,4 +66,35 @@ export interface LandmarkDetailApiResponse {
   data: LandmarkDetailsDto
   errors: string[] | null
   statusCode: number
+}
+
+export interface LandmarksParams {
+  search?: string
+  categoryId?: number
+  pageNumber: number
+  pageSize: number
+}
+
+export interface CreateLandmarkWithMediaParams {
+  titleAr: string
+  titleEn: string
+  descriptionAr: string
+  descriptionEn: string
+  locationTextAr?: string
+  locationTextEn?: string
+  mapUrl: string
+  categoryIds: number[]
+  files?: File[]
+}
+
+export interface UpdateLandmarkParams {
+  id: number
+  titleAr: string
+  titleEn: string
+  descriptionAr: string
+  descriptionEn: string
+  locationTextAr?: string
+  locationTextEn?: string
+  mapUrl: string
+  categoryIds: number[]
 }

@@ -1,33 +1,73 @@
-import { useQuery } from '@tanstack/react-query'
-
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/api/axiosInstance'
-import type { CategoriesApiResponse, CategoryResponseDto } from './useCategories.types'
 
-// ── Query keys ────────────────────────────────────────────────────
-
-export const categoriesKeys = {
-  all: ['categories'] as const,
+export interface CategoryResponseDto {
+  categoryId: number
+  categoryNameAr: string | null
+  categoryNameEn: string | null
 }
 
-// ── Fetch function ────────────────────────────────────────────────
+export interface CategoriesApiResponse {
+  success: boolean
+  data: CategoryResponseDto[]
+}
 
 async function fetchCategories(): Promise<CategoryResponseDto[]> {
   const { data } = await axiosInstance.get<CategoriesApiResponse>('/api/categories')
   return data.data
 }
 
-// ── Hook ─────────────────────────────────────────────────────────
+async function createCategory(dto: { categoryNameAr: string; categoryNameEn: string }) {
+  const { data } = await axiosInstance.post('/api/categories', dto)
+  return data.data
+}
 
-/**
- * Fetches the full list of landmark categories.
- *
- * @example
- *   const { data: categories = [] } = useCategories()
- */
+async function updateCategory(params: { id: number; categoryNameAr: string; categoryNameEn: string }) {
+  const { data } = await axiosInstance.put(`/api/categories/${params.id}`, {
+    categoryNameAr: params.categoryNameAr,
+    categoryNameEn: params.categoryNameEn,
+  })
+  return data.data
+}
+
+async function deleteCategory(id: number) {
+  const { data } = await axiosInstance.delete(`/api/categories/${id}`)
+  return data
+}
+
 export function useCategories() {
   return useQuery({
-    queryKey: categoriesKeys.all,
+    queryKey: ['categories'],
     queryFn: fetchCategories,
-    staleTime: 1000 * 60 * 10, // categories rarely change — cache for 10 min
+  })
+}
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: updateCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
   })
 }

@@ -1,23 +1,25 @@
-// ── Shared ────────────────────────────────────────────────────────
-
-export type MediaType = 0 | 1
-
-export interface PaginationMeta {
-  currentPage: number
-  nextPage: number | null
-  perPage: number
-  previousPage: number | null
-  totalEntries: number
-  totalPages: number
+export interface ArtisanMediaResponseDto {
+  mediaId: number
+  artisanId: number
+  mediaUrl: string | null
+  mediaType: number
+  isCover: boolean
 }
-
-// ── List endpoint ─────────────────────────────────────────────────
 
 export interface ArtisanResponseDto {
   artisanId: number
   nameAr: string | null
   nameEn: string | null
   coverImageUrl: string | null
+}
+
+export interface PaginationMeta {
+  currentPage: number
+  nextPage: number | null
+  previousPage: number | null
+  totalPages: number
+  totalEntries: number
+  perPage: number
 }
 
 export interface ArtisansData {
@@ -28,22 +30,6 @@ export interface ArtisansData {
 export interface ArtisansApiResponse {
   success: boolean
   data: ArtisansData
-}
-
-export interface ArtisansParams {
-  search?: string
-  pageNumber: number
-  pageSize: number
-}
-
-// ── Detail endpoint ───────────────────────────────────────────────
-
-export interface ArtisanMediaResponseDto {
-  mediaId: number
-  artisanId: number
-  mediaUrl: string | null
-  mediaType: MediaType
-  isCover: boolean
 }
 
 export interface ArtisanDetailsDto {
@@ -66,4 +52,34 @@ export interface ArtisanDetailApiResponse {
   data: ArtisanDetailsDto
   errors: string[] | null
   statusCode: number
+}
+
+export interface ArtisansParams {
+  search?: string
+  pageNumber: number
+  pageSize: number
+}
+
+export interface CreateArtisanWithMediaParams {
+  nameAr: string
+  nameEn: string
+  phone: string
+  descriptionAr: string
+  descriptionEn: string
+  locationTextAr?: string
+  locationTextEn?: string
+  mapUrl?: string
+  files?: File[]
+}
+
+export interface UpdateArtisanParams {
+  id: number
+  nameAr: string
+  nameEn: string
+  phone: string
+  descriptionAr: string
+  descriptionEn: string
+  locationTextAr?: string
+  locationTextEn?: string
+  mapUrl?: string
 }

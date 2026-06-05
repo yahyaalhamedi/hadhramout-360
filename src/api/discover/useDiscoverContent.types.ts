@@ -1,16 +1,3 @@
-// ── Shared ────────────────────────────────────────────────────────
-
-export interface PaginationMeta {
-  currentPage: number
-  nextPage: number | null
-  perPage: number
-  previousPage: number | null
-  totalEntries: number
-  totalPages: number
-}
-
-// ── List endpoint ─────────────────────────────────────────────────
-
 export interface DiscoverContentResponseDto {
   contentId: number
   titleAr: string | null
@@ -18,26 +5,24 @@ export interface DiscoverContentResponseDto {
   coverImageUrl: string | null
 }
 
-export interface DiscoverContentData {
+export interface PaginationMeta {
+  currentPage: number
+  nextPage: number | null
+  previousPage: number | null
+  totalPages: number
+  totalEntries: number
+  perPage: number
+}
+
+export interface DiscoverData {
   items: DiscoverContentResponseDto[]
   pagination: PaginationMeta
 }
 
-export interface DiscoverContentApiResponse {
+export interface DiscoverApiResponse {
   success: boolean
-  data: DiscoverContentData
+  data: DiscoverData
 }
-
-export type DiscoverContentCategory = 'culture' | 'food' | 'games'
-
-export interface DiscoverContentParams {
-  search?: string
-  category?: DiscoverContentCategory
-  pageNumber: number
-  pageSize: number
-}
-
-// ── Detail endpoint ───────────────────────────────────────────────
 
 export interface DiscoverContentDetailsDto {
   contentId: number
@@ -48,10 +33,33 @@ export interface DiscoverContentDetailsDto {
   coverImageUrl: string | null
 }
 
-export interface DiscoverContentDetailApiResponse {
+export interface DiscoverDetailApiResponse {
   success: boolean
   message: string | null
   data: DiscoverContentDetailsDto
   errors: string[] | null
   statusCode: number
+}
+
+export interface DiscoverParams {
+  search?: string
+  pageNumber: number
+  pageSize: number
+}
+
+export interface CreateDiscoverContentParams {
+  titleAr: string
+  titleEn: string
+  bodyAr: string
+  bodyEn: string
+  coverImage?: File
+}
+
+export interface UpdateDiscoverContentParams {
+  id: number
+  titleAr: string
+  titleEn: string
+  bodyAr: string
+  bodyEn: string
+  coverImage?: File
 }

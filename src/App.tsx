@@ -13,7 +13,14 @@ import ArtisanDetail from './Pages/artisans/ArtisanDetail'
 import Discover from './Pages/discover/Discover'
 import DiscoverDetail from './Pages/discover/DiscoverDetail'
 import Community from './Pages/community/Community'
+import DashboardLayout from './Pages/dashboard/DashboardLayout'
 import Dashboard from './Pages/dashboard/Dashboard'
+import Users from './Pages/dashboard/Users'
+import Reports from './Pages/dashboard/Reports'
+import DashboardLandmarks from './Pages/dashboard/DashboardLandmarks'
+import DashboardEvents from './Pages/dashboard/DashboardEvents'
+import DashboardArtisans from './Pages/dashboard/DashboardArtisans'
+import DashboardDiscover from './Pages/dashboard/DashboardDiscover'
 import Posts from './Pages/posts/Posts'
 import Favorites from './Pages/favorites/Favorites'
 import ProtectedRoute from './components/atoms/ProtectedRoute'
@@ -76,10 +83,18 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute requiredRoles={[Roles.Admin, Roles.ContentManager]}>
-              <Dashboard />
+              <DashboardLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="landmarks" element={<DashboardLandmarks />} />
+          <Route path="events" element={<DashboardEvents />} />
+          <Route path="artisans" element={<DashboardArtisans />} />
+          <Route path="discover" element={<DashboardDiscover />} />
+        </Route>
         <Route
           path="/posts"
           element={

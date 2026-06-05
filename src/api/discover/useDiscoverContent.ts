@@ -1,24 +1,21 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/api/axiosInstance'
 import type {
-  DiscoverContentApiResponse,
-  DiscoverContentData,
   DiscoverContentDetailsDto,
-  DiscoverContentDetailApiResponse,
-  DiscoverContentParams,
+  DiscoverApiResponse,
+  DiscoverData,
+  DiscoverDetailApiResponse,
+  DiscoverParams,
+  CreateDiscoverContentParams,
+  UpdateDiscoverContentParams,
 } from './useDiscoverContent.types'
 
-type UseDiscoverContentParams = Omit<DiscoverContentParams, 'pageNumber'>
+type UseDiscoverParams = Omit<DiscoverParams, 'pageNumber'>
 
 // ── Fetch functions ───────────────────────────────────────────────
 
-async function fetchDiscoverContent(params: DiscoverContentParams): Promise<DiscoverContentData> {
-  const url = params.category
-    ? `/api/discover-content/${params.category}`
-    : '/api/discover-content'
-
-  const { data } = await axiosInstance.get<DiscoverContentApiResponse>(url, {
+async function fetchDiscoverContent(params: DiscoverParams): Promise<DiscoverData> {
+  const { data } = await axiosInstance.get<DiscoverApiResponse>('/api/discover-content', {
     params: {
       PageNumber: params.pageNumber,
       PageSize: params.pageSize,
@@ -29,19 +26,50 @@ async function fetchDiscoverContent(params: DiscoverContentParams): Promise<Disc
 }
 
 async function fetchDiscoverContentById(id: number): Promise<DiscoverContentDetailsDto> {
-  const { data } = await axiosInstance.get<DiscoverContentDetailApiResponse>(
-    `/api/discover-content/${id}`,
-  )
+  const { data } = await axiosInstance.get<DiscoverDetailApiResponse>(`/api/discover-content/${id}`)
   return data.data
+}
+
+async function createDiscoverContent(params: CreateDiscoverContentParams): Promise<DiscoverContentDetailsDto> {
+  const formData = new FormData()
+  formData.append('TitleAr', params.titleAr)
+  formData.append('TitleEn', params.titleEn)
+  formData.append('BodyAr', params.bodyAr)
+  formData.append('BodyEn', params.bodyEn)
+  if (params.coverImage) formData.append('CoverImage', params.coverImage)
+
+  const { data } = await axiosInstance.post('/api/discover-content', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
+async function updateDiscoverContent(params: UpdateDiscoverContentParams): Promise<DiscoverContentDetailsDto> {
+  const formData = new FormData()
+  formData.append('TitleAr', params.titleAr)
+  formData.append('TitleEn', params.titleEn)
+  formData.append('BodyAr', params.bodyAr)
+  formData.append('BodyEn', params.bodyEn)
+  if (params.coverImage) formData.append('CoverImage', params.coverImage)
+
+  const { data } = await axiosInstance.put(`/api/discover-content/${params.id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
+async function deleteDiscoverContent(id: number): Promise<{ success: boolean }> {
+  const { data } = await axiosInstance.delete(`/api/discover-content/${id}`)
+  return data
 }
 
 // ── Hooks ─────────────────────────────────────────────────────────
 
-export function useDiscoverContent({ search, category, pageSize }: UseDiscoverContentParams) {
+export function useDiscoverContent({ search, pageSize }: UseDiscoverParams) {
   return useInfiniteQuery({
-    queryKey: ['discover-content', { search, category, pageSize }],
+    queryKey: ['discover-content', { search, pageSize }],
     queryFn: ({ pageParam }) =>
-      fetchDiscoverContent({ pageNumber: pageParam, pageSize, search, category }),
+      fetchDiscoverContent({ pageNumber: pageParam, pageSize, search }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.pagination.nextPage ?? undefined,
     getPreviousPageParam: (firstPage) => firstPage.pagination.previousPage ?? undefined,
@@ -53,5 +81,35 @@ export function useDiscoverContentById(id: number | undefined) {
     queryKey: ['discover-content', id],
     queryFn: () => fetchDiscoverContentById(id!),
     enabled: id != null,
+  })
+}
+
+export function useCreateDiscoverContent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createDiscoverContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['discover-content'] })
+    },
+  })
+}
+
+export function useUpdateDiscoverContent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: updateDiscoverContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['discover-content'] })
+    },
+  })
+}
+
+export function useDeleteDiscoverContent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteDiscoverContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['discover-content'] })
+    },
   })
 }
