@@ -157,5 +157,26 @@
   "auth.org.address_ar": "Address (Arabic)",
   "auth.org.map_url": "Google Maps URL",
   "auth.org.username": "Username / Manager Name",
-  "auth.org.button": "CREATE ORGANIZATION ACCOUNT"
+  "auth.org.button": "CREATE ORGANIZATION ACCOUNT",
+
+  "profile.edit": "Edit Profile",
+  "profile.info": "Profile Information",
+  "profile.save": "Save Changes",
+  "profile.update_success": "Profile updated successfully!",
+  "profile.update_error": "Failed to update profile.",
+  "profile.remove_image": "Remove photo",
+  "profile.image_deleted": "Profile image removed.",
+  "profile.change_email": "Change Email",
+  "profile.email_hint": "Current email: {{email}}",
+  "profile.new_email": "New Email",
+  "profile.current_password": "Current Password",
+  "profile.update_email": "Update Email",
+  "profile.email_updated": "Email changed successfully!",
+  "profile.email_error": "Failed to change email.",
+  "profile.change_password": "Change Password",
+  "profile.new_password": "New Password",
+  "profile.update_password": "Update Password",
+  "profile.password_updated": "Password changed successfully!",
+  "profile.password_error": "Failed to change password.",
+  "auth.error.fullname_required": "Full name is required"
 }

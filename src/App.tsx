@@ -26,6 +26,7 @@ import OrgProfile from './Pages/org-panel/OrgProfile'
 import OrgEvents from './Pages/org-panel/OrgEvents'
 import Posts from './Pages/posts/Posts'
 import Favorites from './Pages/favorites/Favorites'
+import EditProfile from './Pages/profile/EditProfile'
 import ProtectedRoute from './components/atoms/ProtectedRoute'
 import { Roles } from './lib/roles'
 
@@ -122,6 +123,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Favorites />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
             </ProtectedRoute>
           }
         />

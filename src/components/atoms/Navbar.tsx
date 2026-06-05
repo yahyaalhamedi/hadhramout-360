@@ -110,7 +110,7 @@ const Navbar = () => {
                 <CircleUserRound className="text-[#0a5c66] h-6 w-6" />
               </Button>
               {/* Fade-in transform Popover container */}
-              <div className="absolute right-0 top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+              <div className={`absolute top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 ${isRtl ? 'left-0' : 'right-0'}`}>
                 <UserProfilePopover
                   userName={userName}
                   userEmail={userEmail}

@@ -157,5 +157,26 @@
   "auth.org.address_ar": "العنوان (بالعربي)",
   "auth.org.map_url": "رابط خريطة جوجل",
   "auth.org.username": "اسم المستخدم / اسم المدير المسؤول",
-  "auth.org.button": "إنشاء حساب مؤسسة"
+  "auth.org.button": "إنشاء حساب مؤسسة",
+
+  "profile.edit": "تعديل الملف الشخصي",
+  "profile.info": "معلومات الملف الشخصي",
+  "profile.save": "حفظ التغييرات",
+  "profile.update_success": "تم تحديث الملف الشخصي بنجاح!",
+  "profile.update_error": "فشل تحديث الملف الشخصي.",
+  "profile.remove_image": "إزالة الصورة",
+  "profile.image_deleted": "تم إزالة صورة الملف الشخصي.",
+  "profile.change_email": "تغيير البريد الإلكتروني",
+  "profile.email_hint": "البريد الحالي: {{email}}",
+  "profile.new_email": "البريد الإلكتروني الجديد",
+  "profile.current_password": "كلمة المرور الحالية",
+  "profile.update_email": "تحديث البريد الإلكتروني",
+  "profile.email_updated": "تم تغيير البريد الإلكتروني بنجاح!",
+  "profile.email_error": "فشل تغيير البريد الإلكتروني.",
+  "profile.change_password": "تغيير كلمة المرور",
+  "profile.new_password": "كلمة المرور الجديدة",
+  "profile.update_password": "تحديث كلمة المرور",
+  "profile.password_updated": "تم تغيير كلمة المرور بنجاح!",
+  "profile.password_error": "فشل تغيير كلمة المرور.",
+  "auth.error.fullname_required": "الاسم الكامل مطلوب"
 }
