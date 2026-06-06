@@ -66,7 +66,6 @@ export default function UserRegisterForm({
           )
         )}
         className="space-y-5"
-        autoComplete="off"
       >
         {/* Full Name */}
         <div className="space-y-1.5">
@@ -77,6 +76,7 @@ export default function UserRegisterForm({
             <input
               type="text"
               placeholder="e.g. Salem Al-Hadrami"
+              autoComplete="off"
               {...register('userName', { required: true })}
               className="w-full h-12 px-4 rounded-2xl bg-slate-50 border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-7 text-sm font-medium text-slate-700"
             />

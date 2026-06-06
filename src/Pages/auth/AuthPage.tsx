@@ -12,14 +12,6 @@ import LoginForm from './components/LoginForm'
 import UserRegisterForm, { type UserRegisterFormData } from './components/UserRegisterForm'
 import OrgRegisterForm, { type OrgRegisterFormData } from './components/OrgRegisterForm'
 
-interface ApiErrorResponse {
-  response?: {
-    data?: {
-      message?: string
-    }
-  }
-}
-
 const BACKGROUND_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
 
@@ -32,7 +24,6 @@ export default function AuthPage() {
 
   const { isLoggedIn } = useAuthContext()
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
   // API mutations
@@ -47,27 +38,19 @@ export default function AuthPage() {
 
   // ── 1. Handle Login Submit ──────────────────────────────────────
   const onLoginSubmit = (data: LoginParams, reset: () => void) => {
-    setErrorMsg(null)
     setSuccessMsg(null)
     loginMutation(data, {
       onSuccess: () => {
         reset()
         navigate('/')
       },
-      onError: (err) => {
-        setErrorMsg((err as ApiErrorResponse).response?.data?.message || t('auth.login.error'))
-      },
     })
   }
 
   // ── 2. Handle User Register Submit ──────────────────────────────
   const onUserRegisterSubmit = (data: UserRegisterFormData, reset: () => void) => {
-    setErrorMsg(null)
     setSuccessMsg(null)
-    if (data.password !== data.confirmPassword) {
-      setErrorMsg(t('auth.error.password_match'))
-      return
-    }
+    if (data.password !== data.confirmPassword) return
 
     registerUserMutation(
       {
@@ -82,9 +65,6 @@ export default function AuthPage() {
           setSuccessMsg(t('auth.success.registered'))
           setSearchParams({ mode: 'login' })
         },
-        onError: (err) => {
-          setErrorMsg((err as ApiErrorResponse).response?.data?.message || t('auth.error.generic'))
-        },
       },
     )
   }
@@ -95,12 +75,8 @@ export default function AuthPage() {
     logoFile: File | null,
     reset: () => void
   ) => {
-    setErrorMsg(null)
     setSuccessMsg(null)
-    if (data.password !== data.confirmPassword) {
-      setErrorMsg(t('auth.error.password_match'))
-      return
-    }
+    if (data.password !== data.confirmPassword) return
 
     registerOrgMutation(
       {
@@ -123,9 +99,6 @@ export default function AuthPage() {
           setSuccessMsg(t('auth.success.registered_org'))
           setSearchParams({ mode: 'login' })
         },
-        onError: (err) => {
-          setErrorMsg((err as ApiErrorResponse).response?.data?.message || t('auth.error.generic'))
-        },
       },
     )
   }
@@ -147,12 +120,7 @@ export default function AuthPage() {
 
       {/* Primary Container */}
       <div className="relative z-10 w-full max-w-lg mt-10">
-        {/* Error or Success notification boxes */}
-        {errorMsg && (
-          <div className="mb-4 rounded-xl bg-destructive/15 text-white border border-destructive/20 p-4 text-sm text-destructive-foreground text-center">
-            {errorMsg}
-          </div>
-        )}
+        {/* Success notification box */}
         {successMsg && (
           <div className="mb-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 p-4 text-sm text-emerald-300 text-center flex items-center justify-center gap-2">
             <CheckCircle2 className="h-4 w-4" />

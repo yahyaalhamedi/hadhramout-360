@@ -1,18 +1,17 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   Camera,
   ArrowLeft,
   ArrowRight,
   Loader2,
-  CheckCircle2,
   Mail,
   Lock,
   User,
   Trash2,
-  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -75,7 +74,6 @@ export default function EditProfile() {
   const { mutate: deleteProfileImage, isPending: deletingImage } = useDeleteProfileImage()
 
   const [activeTab, setActiveTab] = useState<Tab>('profile')
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -102,16 +100,6 @@ export default function EditProfile() {
 
   // ── Handlers ─────────────────────────────────────────────────────
 
-  const showToast = (type: 'success' | 'error', text: string) => {
-    setToast({ type, text })
-    setTimeout(() => setToast(null), 4000)
-  }
-
-  const apiError = (err: Error) => {
-    const apiErr = err as Error & { response?: { data?: { message?: string } } }
-    return apiErr.response?.data?.message
-  }
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -125,9 +113,8 @@ export default function EditProfile() {
       onSuccess: () => {
         setPreviewUrl(null)
         setSelectedFile(null)
-        showToast('success', t('profile.image_deleted'))
+        toast.success(t('profile.image_deleted'))
       },
-      onError: (err) => showToast('error', apiError(err) || t('profile.update_error')),
     })
   }
 
@@ -139,8 +126,7 @@ export default function EditProfile() {
         profileImageFile: selectedFile ?? undefined,
       },
       {
-        onSuccess: () => showToast('success', t('profile.update_success')),
-        onError: (err) => showToast('error', apiError(err) || t('profile.update_error')),
+        onSuccess: () => toast.success(t('profile.update_success')),
       },
     )
   }
@@ -150,27 +136,25 @@ export default function EditProfile() {
       { newEmail: data.newEmail, currentPassword: data.currentPassword },
       {
         onSuccess: () => {
-          showToast('success', t('profile.email_updated'))
+          toast.success(t('profile.email_updated'))
           emailForm.reset({ newEmail: '', currentPassword: '' })
         },
-        onError: (err) => showToast('error', apiError(err) || t('profile.email_error')),
       },
     )
   }
 
   const onPasswordSubmit = (data: PasswordFormData) => {
     if (data.newPassword !== data.confirmPassword) {
-      showToast('error', t('auth.error.password_match'))
+      toast.error(t('auth.error.password_match'))
       return
     }
     changePassword(
       { currentPassword: data.currentPassword, newPassword: data.newPassword },
       {
         onSuccess: () => {
-          showToast('success', t('profile.password_updated'))
+          toast.success(t('profile.password_updated'))
           passwordForm.reset({ currentPassword: '', newPassword: '', confirmPassword: '' })
         },
-        onError: (err) => showToast('error', apiError(err) || t('profile.password_error')),
       },
     )
   }
@@ -242,9 +226,6 @@ export default function EditProfile() {
         <div className="absolute top-[25%] left-[50%] -translate-x-1/2 w-[400px] h-[200px] rounded-full bg-[#096866]/[0.04] blur-[80px] animate-[breathe_5s_ease-in-out_infinite]" />
         <div className="absolute bottom-[20%] left-[20%] w-[300px] h-[300px] rounded-full bg-[#cea46c]/[0.03] blur-[100px] animate-[breathe_7s_ease-in-out_infinite_2s]" />
       </div>
-
-      {/* Toast */}
-      {toast && <Toast toast={toast} onDismiss={() => setToast(null)} />}
 
       {/* Card */}
       <div className="relative z-10 w-full max-w-[460px]">
@@ -320,7 +301,7 @@ export default function EditProfile() {
               <button
                 key={tab.key}
                 type="button"
-                onClick={() => { setActiveTab(tab.key); setToast(null) }}
+                onClick={() => setActiveTab(tab.key)}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-3.5 text-xs font-semibold transition-all duration-200 cursor-pointer relative
                   ${activeTab === tab.key
                     ? 'text-[#096866] bg-white'
@@ -562,40 +543,5 @@ function PasswordTab({
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('profile.update_password')}
       </Button>
     </form>
-  )
-}
-
-// ── Toast ────────────────────────────────────────────────────────────
-
-function Toast({
-  toast,
-  onDismiss,
-}: {
-  toast: { type: 'success' | 'error'; text: string }
-  onDismiss: () => void
-}) {
-  const isSuccess = toast.type === 'success'
-  return (
-    <div
-      className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] max-w-sm w-[calc(100%-2rem)] rounded-2xl px-5 py-3.5 shadow-xl flex items-center gap-3 animate-[slideDown_0.3s_ease-out]
-        ${isSuccess
-          ? 'bg-white border border-emerald-200 text-emerald-700'
-          : 'bg-white border border-red-200 text-red-600'
-        }`}
-    >
-      {isSuccess ? (
-        <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-      ) : (
-        <X className="h-5 w-5 text-red-500 shrink-0" />
-      )}
-      <span className="text-sm font-medium flex-1">{toast.text}</span>
-      <button
-        type="button"
-        onClick={onDismiss}
-        className="text-slate-400 hover:text-slate-600 cursor-pointer shrink-0 transition-colors"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
   )
 }

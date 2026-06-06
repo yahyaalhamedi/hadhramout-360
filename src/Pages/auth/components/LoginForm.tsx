@@ -42,7 +42,6 @@ export default function LoginForm({
       <form
         onSubmit={handleSubmit((data) => onSubmit(data, () => reset({ email: '', password: '' })))}
         className="space-y-6"
-        autoComplete="off"
       >
         {/* Email Field */}
         <div className="space-y-2">
@@ -53,7 +52,7 @@ export default function LoginForm({
             <input
               type="email"
               placeholder="name@example.com"
-              autoComplete="off"
+              autoComplete="email"
               {...register('email', { required: true })}
               className="w-full h-12 px-4 rounded-2xl bg-slate-50 border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-7 text-sm font-medium text-slate-700"
             />
@@ -75,7 +74,7 @@ export default function LoginForm({
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
-              autoComplete="new-password"
+              autoComplete="current-password"
               {...register('password', { required: true })}
               className="w-full h-12 px-4 rounded-2xl bg-slate-50 border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-7 text-sm font-medium text-slate-700"
             />

@@ -23,6 +23,7 @@ async function loginUser(params: LoginParams): Promise<LoginResponseData> {
 
 async function registerUser(params: RegisterUserParams): Promise<RegisterUserResponse> {
   const formData = new FormData()
+  formData.append('FullName', params.userName)
   formData.append('UserName', params.userName)
   formData.append('Email', params.email)
   formData.append('Password', params.password)
@@ -58,6 +59,7 @@ async function registerOrganization(
   if (params.mapUrl) formData.append('MapUrl', params.mapUrl)
   if (params.logoFile) formData.append('LogoFile', params.logoFile)
 
+  formData.append('FullName', params.userName)
   formData.append('UserName', params.userName)
   formData.append('Email', params.email)
   formData.append('Password', params.password)
