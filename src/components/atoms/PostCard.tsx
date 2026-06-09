@@ -5,6 +5,75 @@ import { useTranslation } from 'react-i18next'
 import { useGetRtl } from '@/lib/utils'
 import type { CommunityPostMediaResponseDto } from '@/api/community/useCommunityPosts.types'
 
+const URL_REGEX = /(https?:\/\/[^\s<>"')\]]+)/g
+const IMAGE_EXT_REGEX = /\.(jpe?g|png|gif|webp|svg|bmp|ico|tiff?|avif)(\?.*)?$/i
+const IMAGE_HOST_REGEX = /(imgur\.com|i\.ibb\.co|unsplash\.com|images\.unsplash\.com|pbs\.twimg\.com|media\.giphy\.com|cdn\.discordapp\.com|i\.redd\.it|preview\.redd\.it|live\.staticflickr\.com|farm\d+\.staticflickr\.com|img\.shields\.io)/i
+
+function isImageUrl(url: string): boolean {
+  return IMAGE_EXT_REGEX.test(url) || IMAGE_HOST_REGEX.test(url)
+}
+
+function renderContentWithLinks(text: string) {
+  const parts = text.split(URL_REGEX)
+  return parts.map((part, i) => {
+    if (URL_REGEX.test(part)) {
+      URL_REGEX.lastIndex = 0
+      if (isImageUrl(part)) {
+        return (
+          <span key={i} className="block my-2">
+            <a
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={part}
+                alt={part}
+                className="max-w-full max-h-[400px] rounded-xl object-cover cursor-pointer border border-tertiary-1"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget
+                  target.style.display = 'none'
+                  const fallback = target.nextElementSibling as HTMLElement | null
+                  if (fallback) fallback.style.display = 'flex'
+                }}
+              />
+            </a>
+            <span
+              className="hidden items-center gap-2 mt-1 text-xs text-muted-foreground"
+              style={{ display: 'none' }}
+            >
+              <a
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-7 underline hover:text-primary-8 break-all"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {part}
+              </a>
+            </span>
+          </span>
+        )
+      }
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary-7 underline hover:text-primary-8 break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 interface PostCardProps {
   postId: number
   userName: string
@@ -195,7 +264,9 @@ export default function PostCard({
       ) : (
         /* Content — read mode */
         contentText && (
-          <p className="mb-4 text-sm leading-relaxed text-tertiary-8">{contentText}</p>
+          <div className="mb-4 text-sm leading-relaxed text-tertiary-8 whitespace-pre-wrap break-words">
+            {renderContentWithLinks(contentText)}
+          </div>
         )
       )}
 
