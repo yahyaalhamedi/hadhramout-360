@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import InfiniteScroll from 'react-infinite-scroller'
 import PostCard from '@/components/atoms/PostCard'
 import CreatePostForm from '@/components/atoms/CreatePostForm'
@@ -13,9 +14,10 @@ import { useAuthContext } from '@/lib/AuthContext'
 
 const Community = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const { userName, userId } = useAuthContext()
+  const { userName, userId, isLoggedIn } = useAuthContext()
   const displayName = userName || 'User'
 
   const { data, fetchNextPage, hasNextPage, isFetching, isError } = useCommunityPosts({
@@ -67,7 +69,14 @@ const Community = () => {
               />
 
               {/* View All Posts Button */}
-              <button className="w-full rounded-full bg-primary-7 py-4 text-sm font-bold text-white hover:bg-primary-8 transition-colors cursor-pointer">
+              <button
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    navigate('/auth')
+                  }
+                }}
+                className="w-full rounded-full bg-primary-7 py-4 text-sm font-bold text-white hover:bg-primary-8 transition-colors cursor-pointer"
+              >
                 {t('community.view_all_posts')}
               </button>
             </div>
