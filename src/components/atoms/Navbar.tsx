@@ -169,12 +169,12 @@ const Navbar = () => {
               >
                 <Button
                   variant="ghost"
-                  className={`cursor-pointer h-auto w-auto px-2.5 gap-1.5 flex ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}
+                  className={`cursor-pointer h-auto w-auto px-2.5 gap-1.5 flex ${isRtl ? 'flex-row-reverse' : 'flex-row'} group hover:bg-transparent`}
                   onClick={toggleProfile}
                   aria-expanded={isProfileOpen}
                   aria-haspopup="true"
                 >
-                  <CircleUserRound className="text-[#D2A870] h-15 w-15" />
+                  <CircleUserRound size={36} className="text-[#D2A870] transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-md group-hover:brightness-110" />
                   <ChevronDown
                     className={`h-4 w-4 text-[#D2A870] transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`}
                     aria-hidden="true"
@@ -216,9 +216,10 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="icon"
+                className="group hover:bg-transparent h-auto w-auto p-2"
                 onClick={() => navigate('/auth?mode=login')}
               >
-                <CircleUserRound />
+                <CircleUserRound size={36} className="text-[#D2A870] transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-md group-hover:brightness-110" />
               </Button>
             )}
           </NavigationMenuItem>

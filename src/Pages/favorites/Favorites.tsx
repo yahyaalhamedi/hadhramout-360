@@ -60,8 +60,8 @@ const Favorites = () => {
                   </div>
                 )}
                 <div className="absolute top-3 right-3">
-                  <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-                    <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white bg-secondary text-secondary-9 backdrop-blur-md transition-all shadow-sm">
+                    <Heart className="h-5 w-5 fill-current" />
                   </div>
                 </div>
               </div>
