@@ -7,6 +7,7 @@ import type {
   EventsData,
   EventsParams,
   CreateEventWithMediaParams,
+  CreateEventParams,
   UpdateEventParams,
 } from './useEvents.types'
 
@@ -45,10 +46,28 @@ async function createEventWithMedia(params: CreateEventWithMediaParams): Promise
   if (params.formUrl) formData.append('FormUrl', params.formUrl)
   formData.append('StartDate', params.startDate)
   formData.append('EndDate', params.endDate)
-  params.files?.forEach((file) => formData.append('Files', file))
+  if (params.files && params.files.length > 0) {
+    params.files.forEach((file) => formData.append('Files', file))
+  }
 
   const { data } = await axiosInstance.post('/api/events/with-media', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
+async function createEvent(params: CreateEventParams): Promise<EventDetailsDto> {
+  const { data } = await axiosInstance.post('/api/events', {
+    titleAr: params.titleAr,
+    titleEn: params.titleEn,
+    descriptionAr: params.descriptionAr,
+    descriptionEn: params.descriptionEn,
+    addressAr: params.addressAr,
+    addressEn: params.addressEn,
+    mapUrl: params.mapUrl,
+    formUrl: params.formUrl,
+    startDate: params.startDate,
+    endDate: params.endDate,
   })
   return data.data
 }
@@ -113,6 +132,16 @@ export function useCreateEventWithMedia() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createEventWithMedia,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+    },
+  })
+}
+
+export function useCreateEvent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] })
     },

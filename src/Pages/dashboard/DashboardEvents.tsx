@@ -1,13 +1,17 @@
-import { useState, useMemo, useRef } from 'react'
-import { Search, Trash2, Plus, Pencil, Upload } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Search, Trash2, Pencil } from 'lucide-react'
 import {
   useEvents,
-  useCreateEventWithMedia,
   useUpdateEvent,
   useDeleteEvent,
+  useAddEventMedia,
+  useDeleteEventMedia,
+  useEvent,
 } from '@/api/events/useEvents'
 import type { EventResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
+import EventFormModal, { emptyEventForm } from '@/components/atoms/EventFormModal'
+import type { EventFormData } from '@/components/atoms/EventFormModal'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -18,48 +22,32 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const emptyForm = {
-  titleAr: '',
-  titleEn: '',
-  descriptionAr: '',
-  descriptionEn: '',
-  addressAr: '',
-  addressEn: '',
-  mapUrl: '',
-  formUrl: '',
-  startDate: '',
-  endDate: '',
-}
-
 export default function DashboardEvents() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [form, setForm] = useState(emptyForm)
-  const [files, setFiles] = useState<File[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [form, setForm] = useState<EventFormData>(emptyEventForm)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [mediaFiles, setMediaFiles] = useState<File[]>([])
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useEvents({
     search: search || undefined,
     pageSize: 10,
   })
 
-  const createMutation = useCreateEventWithMedia()
+  const { data: editingEvent } = useEvent(editingId ?? undefined)
+
   const updateMutation = useUpdateEvent()
   const deleteMutation = useDeleteEvent()
+  const addMediaMutation = useAddEventMedia()
+  const deleteMediaMutation = useDeleteEventMedia()
 
   const events = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
   }, [data])
 
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
-
-  const openCreate = () => {
-    setEditingId(null)
-    setForm(emptyForm)
-    setFiles([])
-    setShowModal(true)
-  }
 
   const openEdit = (ev: EventResponseDto) => {
     setEditingId(ev.eventId)
@@ -72,11 +60,25 @@ export default function DashboardEvents() {
       addressEn: ev.addressEn ?? '',
       mapUrl: '',
       formUrl: '',
-      startDate: ev.startDate ? new Date(ev.startDate).toISOString().slice(0, 16) : '',
-      endDate: ev.endDate ? new Date(ev.endDate).toISOString().slice(0, 16) : '',
+      startDate: ev.startDate ? new Date(ev.startDate).toISOString().slice(0, 10) : '',
+      endDate: ev.endDate ? new Date(ev.endDate).toISOString().slice(0, 10) : '',
     })
-    setFiles([])
+    setCoverFile(null)
+    setCoverPreview(null)
+    setMediaFiles([])
     setShowModal(true)
+  }
+
+  if (editingId && editingEvent && !form.descriptionAr && editingEvent.descriptionAr) {
+    setForm((prev) => ({
+      ...prev,
+      descriptionAr: editingEvent.descriptionAr ?? '',
+      descriptionEn: editingEvent.descriptionEn ?? '',
+      addressAr: editingEvent.addressAr ?? prev.addressAr,
+      addressEn: editingEvent.addressEn ?? prev.addressEn,
+      mapUrl: editingEvent.mapUrl ?? '',
+      formUrl: editingEvent.formUrl ?? '',
+    }))
   }
 
   const handleSubmit = () => {
@@ -89,18 +91,7 @@ export default function DashboardEvents() {
           onSuccess: () => {
             setShowModal(false)
             setEditingId(null)
-            setForm(emptyForm)
-          },
-        },
-      )
-    } else {
-      createMutation.mutate(
-        { ...form, files },
-        {
-          onSuccess: () => {
-            setShowModal(false)
-            setForm(emptyForm)
-            setFiles([])
+            setForm(emptyEventForm)
           },
         },
       )
@@ -112,19 +103,41 @@ export default function DashboardEvents() {
     deleteMutation.mutate(id)
   }
 
+  const handleClose = () => {
+    setShowModal(false)
+    setEditingId(null)
+    setForm(emptyEventForm)
+    setCoverFile(null)
+    setCoverPreview(null)
+    setMediaFiles([])
+  }
+
+  const handleCoverChange = (file: File | null) => {
+    setCoverFile(file)
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => setCoverPreview(reader.result as string)
+      reader.readAsDataURL(file)
+    } else {
+      setCoverPreview(null)
+    }
+  }
+
+  const handleAddMedia = (file: File) => {
+    if (!editingId) return
+    addMediaMutation.mutate({ id: editingId, file })
+  }
+
+  const handleDeleteMedia = (mediaId: number) => {
+    deleteMediaMutation.mutate(mediaId)
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
           EVENTS
         </h2>
-        <button
-          onClick={openCreate}
-          className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          New Event
-        </button>
       </div>
 
       <div className="relative mb-6">
@@ -204,77 +217,24 @@ export default function DashboardEvents() {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-slate-900 mb-6">{editingId ? 'Edit Event' : 'New Event'}</h3>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Title (AR) *</label>
-                  <input value={form.titleAr} onChange={(e) => setForm((p) => ({ ...p, titleAr: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Title (EN) *</label>
-                  <input value={form.titleEn} onChange={(e) => setForm((p) => ({ ...p, titleEn: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Description (AR) *</label>
-                  <textarea value={form.descriptionAr} onChange={(e) => setForm((p) => ({ ...p, descriptionAr: e.target.value }))} rows={3} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Description (EN) *</label>
-                  <textarea value={form.descriptionEn} onChange={(e) => setForm((p) => ({ ...p, descriptionEn: e.target.value }))} rows={3} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Address (AR) *</label>
-                  <input value={form.addressAr} onChange={(e) => setForm((p) => ({ ...p, addressAr: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Address (EN) *</label>
-                  <input value={form.addressEn} onChange={(e) => setForm((p) => ({ ...p, addressEn: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Start Date *</label>
-                  <input type="datetime-local" value={form.startDate} onChange={(e) => setForm((p) => ({ ...p, startDate: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">End Date *</label>
-                  <input type="datetime-local" value={form.endDate} onChange={(e) => setForm((p) => ({ ...p, endDate: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Map URL</label>
-                <input value={form.mapUrl} onChange={(e) => setForm((p) => ({ ...p, mapUrl: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" placeholder="https://maps.google.com/..." />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Registration URL</label>
-                <input value={form.formUrl} onChange={(e) => setForm((p) => ({ ...p, formUrl: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" placeholder="https://..." />
-              </div>
-              {!editingId && (
-                <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Media Files</label>
-                  <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => setFiles(Array.from(e.target.files ?? []))} className="hidden" />
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-10 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    {files.length > 0 ? `${files.length} file(s) selected` : 'Choose files...'}
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => { setShowModal(false); setEditingId(null); setForm(emptyForm); setFiles([]) }} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
-              <button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer">
-                {createMutation.isPending || updateMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <EventFormModal
+          form={form}
+          setForm={setForm}
+          editingId={editingId}
+          isPending={updateMutation.isPending}
+          onSubmit={handleSubmit}
+          onClose={handleClose}
+          coverFile={coverFile}
+          setCoverFile={handleCoverChange}
+          coverPreview={coverPreview}
+          mediaFiles={mediaFiles}
+          setMediaFiles={setMediaFiles}
+          existingMedia={editingEvent?.media ?? null}
+          onAddMedia={handleAddMedia}
+          onDeleteMedia={handleDeleteMedia}
+          isAddingMedia={addMediaMutation.isPending}
+          isDeletingMedia={deleteMediaMutation.isPending}
+        />
       )}
     </>
   )

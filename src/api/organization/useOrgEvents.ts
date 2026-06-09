@@ -6,6 +6,7 @@ import type {
   EventDetailApiResponse,
   PaginationMeta,
   CreateEventWithMediaParams,
+  CreateEventParams,
   UpdateEventParams,
 } from '@/api/events/useEvents.types'
 
@@ -63,10 +64,28 @@ async function createOrgEventWithMedia(params: CreateEventWithMediaParams): Prom
   if (params.formUrl) formData.append('FormUrl', params.formUrl)
   formData.append('StartDate', params.startDate)
   formData.append('EndDate', params.endDate)
-  params.files?.forEach((file) => formData.append('Files', file))
+  if (params.files && params.files.length > 0) {
+    params.files.forEach((file) => formData.append('Files', file))
+  }
 
   const { data } = await axiosInstance.post('/api/events/with-media', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
+async function createOrgEvent(params: CreateEventParams): Promise<EventDetailsDto> {
+  const { data } = await axiosInstance.post('/api/events', {
+    titleAr: params.titleAr,
+    titleEn: params.titleEn,
+    descriptionAr: params.descriptionAr,
+    descriptionEn: params.descriptionEn,
+    addressAr: params.addressAr,
+    addressEn: params.addressEn,
+    mapUrl: params.mapUrl,
+    formUrl: params.formUrl,
+    startDate: params.startDate,
+    endDate: params.endDate,
   })
   return data.data
 }
@@ -89,6 +108,20 @@ async function updateOrgEvent(params: UpdateEventParams): Promise<EventDetailsDt
 
 async function deleteOrgEvent(id: number): Promise<{ success: boolean }> {
   const { data } = await axiosInstance.delete(`/api/events/${id}`)
+  return data
+}
+
+async function addOrgEventMedia(id: number, file: File): Promise<{ mediaId: number; mediaUrl: string }> {
+  const formData = new FormData()
+  formData.append('File', file)
+  const { data } = await axiosInstance.post(`/api/events/${id}/media`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
+async function deleteOrgEventMedia(mediaId: number): Promise<{ success: boolean }> {
+  const { data } = await axiosInstance.delete(`/api/events/media/${mediaId}`)
   return data
 }
 
@@ -123,6 +156,16 @@ export function useCreateOrgEventWithMedia() {
   })
 }
 
+export function useCreateOrgEvent() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createOrgEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+    },
+  })
+}
+
 export function useUpdateOrgEvent() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -137,6 +180,26 @@ export function useDeleteOrgEvent() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteOrgEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+    },
+  })
+}
+
+export function useAddOrgEventMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => addOrgEventMedia(id, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+    },
+  })
+}
+
+export function useDeleteOrgEventMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteOrgEventMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },

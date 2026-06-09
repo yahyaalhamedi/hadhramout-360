@@ -115,3 +115,5 @@ export interface UpdateEventParams {
   startDate: string
   endDate: string
 }
+
+export type CreateEventParams = Omit<UpdateEventParams, 'id'>

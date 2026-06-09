@@ -126,7 +126,10 @@ const EventDetail = () => {
             </h2>
 
             {description ? (
-              <p className="leading-relaxed text-muted-foreground">{description}</p>
+              <div
+                className="prose prose-slate max-w-none leading-relaxed text-muted-foreground prose-headings:text-foreground prose-p:my-3 prose-ul:my-3 prose-ol:my-3 prose-li:my-1"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
             ) : (
               <p className="leading-relaxed text-muted-foreground/50 italic">
                 {t('event.no_description', 'No description available.')}

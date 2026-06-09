@@ -1,13 +1,15 @@
-import { useState, useMemo, useRef } from 'react'
-import { Search, Trash2, Plus, Pencil, Upload } from 'lucide-react'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import { Search, Trash2, Plus, Pencil, Upload, X, Loader2 } from 'lucide-react'
 import {
   useDiscoverContent,
+  useDiscoverContentById,
   useCreateDiscoverContent,
   useUpdateDiscoverContent,
   useDeleteDiscoverContent,
 } from '@/api/discover/useDiscoverContent'
 import type { DiscoverContentResponseDto } from '@/api/discover/useDiscoverContent.types'
 import { baseURL } from '@/api/axiosInstance'
+import RichTextEditor from '@/components/atoms/RichTextEditor'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -38,6 +40,21 @@ export default function DashboardDiscover() {
   const updateMutation = useUpdateDiscoverContent()
   const deleteMutation = useDeleteDiscoverContent()
 
+  // Fetch full detail for edit to get bodyAr/bodyEn
+  const { data: editingDetail } = useDiscoverContentById(editingId ?? undefined)
+
+  // Populate form when editing detail loads
+  useEffect(() => {
+    if (editingId && editingDetail && !form.bodyAr && editingDetail.bodyAr) {
+      setForm({
+        titleAr: editingDetail.titleAr ?? '',
+        titleEn: editingDetail.titleEn ?? '',
+        bodyAr: editingDetail.bodyAr ?? '',
+        bodyEn: editingDetail.bodyEn ?? '',
+      })
+    }
+  }, [editingId, editingDetail, form.bodyAr])
+
   const items = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
   }, [data])
@@ -53,14 +70,16 @@ export default function DashboardDiscover() {
 
   const openEdit = (item: DiscoverContentResponseDto) => {
     setEditingId(item.contentId)
-    setForm({
-      titleAr: item.titleAr ?? '',
-      titleEn: item.titleEn ?? '',
-      bodyAr: '',
-      bodyEn: '',
-    })
+    setForm(emptyForm)
     setCoverImage(null)
     setShowModal(true)
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setEditingId(null)
+    setForm(emptyForm)
+    setCoverImage(null)
   }
 
   const handleSubmit = () => {
@@ -69,25 +88,12 @@ export default function DashboardDiscover() {
     if (editingId) {
       updateMutation.mutate(
         { id: editingId, ...form, coverImage: coverImage ?? undefined },
-        {
-          onSuccess: () => {
-            setShowModal(false)
-            setEditingId(null)
-            setForm(emptyForm)
-            setCoverImage(null)
-          },
-        },
+        { onSuccess: closeModal },
       )
     } else {
       createMutation.mutate(
         { ...form, coverImage: coverImage ?? undefined },
-        {
-          onSuccess: () => {
-            setShowModal(false)
-            setForm(emptyForm)
-            setCoverImage(null)
-          },
-        },
+        { onSuccess: closeModal },
       )
     }
   }
@@ -96,6 +102,12 @@ export default function DashboardDiscover() {
     if (!confirm('Are you sure you want to delete this content?')) return
     deleteMutation.mutate(id)
   }
+
+  const coverPreview = coverImage
+    ? URL.createObjectURL(coverImage)
+    : editingId
+      ? getImageUrl(editingDetail?.coverImageUrl ?? null)
+      : null
 
   return (
     <>
@@ -185,7 +197,12 @@ export default function DashboardDiscover() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-slate-900 mb-6">{editingId ? 'Edit Content' : 'New Content'}</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Content' : 'New Content'}</h3>
+              <button onClick={closeModal} className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -199,24 +216,52 @@ export default function DashboardDiscover() {
               </div>
               <div>
                 <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Body (AR) *</label>
-                <textarea value={form.bodyAr} onChange={(e) => setForm((p) => ({ ...p, bodyAr: e.target.value }))} rows={5} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
+                <RichTextEditor
+                  value={form.bodyAr}
+                  onChange={(val) => setForm((p) => ({ ...p, bodyAr: val }))}
+                  placeholder="Write the Arabic content..."
+                />
               </div>
               <div>
                 <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Body (EN) *</label>
-                <textarea value={form.bodyEn} onChange={(e) => setForm((p) => ({ ...p, bodyEn: e.target.value }))} rows={5} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
+                <RichTextEditor
+                  value={form.bodyEn}
+                  onChange={(val) => setForm((p) => ({ ...p, bodyEn: val }))}
+                  placeholder="Write the English content..."
+                />
               </div>
               <div>
                 <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Cover Image</label>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => setCoverImage(e.target.files?.[0] ?? null)} className="hidden" />
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-10 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  {coverImage ? coverImage.name : 'Choose cover image...'}
-                </button>
+                {coverPreview ? (
+                  <div className="relative group">
+                    <img src={coverPreview} alt="Cover preview" className="w-full h-40 object-cover rounded-lg border border-slate-200" />
+                    <button
+                      type="button"
+                      onClick={() => { setCoverImage(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
+                      className="absolute top-2 end-2 p-1.5 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-20 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    Choose cover image...
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => { setShowModal(false); setEditingId(null); setForm(emptyForm); setCoverImage(null) }} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
-              <button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer">
+              <button onClick={closeModal} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={createMutation.isPending || updateMutation.isPending || !form.titleAr || !form.titleEn || !form.bodyAr || !form.bodyEn}
+                className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              >
+                {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin" />}
                 {createMutation.isPending || updateMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
