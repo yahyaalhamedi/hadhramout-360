@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import hadhramoutAR from '@/assets/hadhramoutAR.svg'
 import hadhramoutEN from '@/assets/hadhramoutEN.svg'
-import { Globe, CircleUserRound } from 'lucide-react'
+import { Globe, CircleUserRound, ChevronDown } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -58,6 +58,8 @@ const NavMenuItem = ({ title, href }: { title: string; href: string }) => {
   )
 }
 
+const CLOSE_DELAY_MS = 300
+
 const Navbar = () => {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -67,6 +69,51 @@ const Navbar = () => {
   const { isLoggedIn, userName, userEmail, roles, isAdmin, logout } = useAuthContext()
   const { data: profile } = useProfile({ enabled: isLoggedIn })
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }, [])
+
+  const scheduleClose = useCallback(() => {
+    clearCloseTimer()
+    closeTimerRef.current = setTimeout(() => {
+      setIsProfileOpen(false)
+    }, CLOSE_DELAY_MS)
+  }, [clearCloseTimer])
+
+  const openProfile = useCallback(() => {
+    clearCloseTimer()
+    setIsProfileOpen(true)
+  }, [clearCloseTimer])
+
+  const toggleProfile = useCallback(() => {
+    setIsProfileOpen((prev) => {
+      if (!prev) clearCloseTimer()
+      return !prev
+    })
+  }, [clearCloseTimer])
+
+  const closeProfile = useCallback(() => {
+    clearCloseTimer()
+    setIsProfileOpen(false)
+  }, [clearCloseTimer])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isProfileOpen) {
+        closeProfile()
+        containerRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isProfileOpen, closeProfile])
 
   const handleLogoutConfirm = () => {
     logout()
@@ -102,35 +149,67 @@ const Navbar = () => {
             ))}
           </NavigationMenuItem>
 
-          <NavigationMenuItem className="flex items-center gap-1">
+          <NavigationMenuItem className="flex items-center gap-1.5">
             <Button
               variant="ghost"
               onClick={toggleLanguage}
             >
               <div className="flex gap-2">
-                <Label>{isRtl ? 'EN' : 'AR'}</Label>
-                <Globe />
+                <Label className="text-[#D2A870]">{isRtl ? 'EN' : 'AR'}</Label>
+                <Globe className="text-[#D2A870]" />
               </div>
             </Button>
 
             {isLoggedIn ? (
-              <div className="relative group py-2">
+              <div
+                ref={containerRef}
+                className="relative py-2 focus-within:z-50"
+                onMouseEnter={openProfile}
+                onMouseLeave={scheduleClose}
+              >
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="cursor-pointer"
+                  className={`cursor-pointer h-auto w-auto px-2.5 gap-1.5 flex ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}
+                  onClick={toggleProfile}
+                  aria-expanded={isProfileOpen}
+                  aria-haspopup="true"
                 >
-                  <CircleUserRound className="text-[#0a5c66] h-6 w-6" />
-                </Button>
-                <div className={`absolute top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 ${isRtl ? 'left-0' : 'right-0'}`}>
-                  <UserProfilePopover
-                    userName={profile?.fullName || userName}
-                    userEmail={userEmail}
-                    avatarUrl={profile?.profileImageUrl ? `${baseURL}${profile.profileImageUrl}` : undefined}
-                    isAdmin={isAdmin}
-                    roles={roles}
-                    onLogoutRequest={() => setShowLogoutModal(true)}
+                  <CircleUserRound className="text-[#D2A870] h-15 w-15" />
+                  <ChevronDown
+                    className={`h-4 w-4 text-[#D2A870] transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
                   />
+                </Button>
+
+                <div
+                  className={`absolute top-full ${isRtl ? 'left-0' : 'right-0'} z-50`}
+                >
+                  {/* Hover bridge: invisible connector that widens the mouse path */}
+                  <div
+                    className={`absolute top-0 h-4 ${isRtl ? 'left-0 right-0' : 'left-0 right-0'} -translate-y-full pointer-events-auto`}
+                    aria-hidden="true"
+                  />
+                  <div
+                    role="menu"
+                    className={`
+                      transition-all duration-200 ease-out
+                      ${isProfileOpen
+                        ? 'opacity-100 translate-y-0 pointer-events-auto'
+                        : 'opacity-0 translate-y-2 pointer-events-none'
+                      }
+                    `}
+                    onMouseEnter={openProfile}
+                    onMouseLeave={scheduleClose}
+                  >
+                    <UserProfilePopover
+                      userName={profile?.fullName || userName}
+                      userEmail={userEmail}
+                      avatarUrl={profile?.profileImageUrl ? `${baseURL}${profile.profileImageUrl}` : undefined}
+                      isAdmin={isAdmin}
+                      roles={roles}
+                      onLogoutRequest={() => setShowLogoutModal(true)}
+                    />
+                  </div>
                 </div>
               </div>
             ) : (
