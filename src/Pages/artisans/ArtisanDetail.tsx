@@ -285,7 +285,7 @@ const ArtisanDetail = () => {
           }}
           className="w-full"
         >
-          <CarouselContent className={`gap-6 ${isRtl ? 'ms-0' : ''}`}>
+          <CarouselContent className="pe-6">
             {otherArtisans.map((a) => {
               const otherName = isRtl ? a.nameAr : a.nameEn
               const isPlaceholder = a.artisanId < 0
@@ -296,7 +296,7 @@ const ArtisanDetail = () => {
               return (
                 <CarouselItem
                   key={a.artisanId}
-                  className="basis-full sm:basis-1/2 md:basis-1/3 pl-0"
+                  className="basis-full sm:basis-1/2 md:basis-1/3"
                 >
                   <div
                     className="cursor-pointer"
@@ -330,8 +330,8 @@ const ArtisanDetail = () => {
               )
             })}
           </CarouselContent>
-          <CarouselPrevious className="-start-12 top-[40%]" />
-          <CarouselNext className="-end-12 top-[40%]" />
+          <CarouselPrevious className="top-[40%]" />
+          <CarouselNext className="top-[40%]" />
         </Carousel>
       </section>
     </div>
