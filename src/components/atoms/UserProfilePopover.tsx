@@ -19,7 +19,7 @@ export default function UserProfilePopover({
   userName,
   userEmail,
   userPhone,
-  avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+  avatarUrl = '/profile.png',
   roles = [],
   onLogoutRequest,
 }: UserProfilePopoverProps) {

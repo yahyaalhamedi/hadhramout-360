@@ -46,8 +46,7 @@ type Tab = 'profile' | 'email' | 'password'
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const FALLBACK_AVATAR =
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+const FALLBACK_AVATAR = '/profile.png'
 
 const BG_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'

@@ -75,7 +75,7 @@ export default function CreatePostForm({
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
         <img
-          src={userAvatar ? `${baseURL}${userAvatar}` : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+          src={userAvatar ? `${baseURL}${userAvatar}` : '/profile.png'}
           alt={userName}
           className="h-12 w-12 rounded-full object-cover"
         />
