@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { MapPin, LinkIcon, Mail, Phone, Upload, Pencil, Eye, EyeOff } from 'lucide-react'
+import { MapPin, LinkIcon, Mail, Phone, Upload, Pencil } from 'lucide-react'
 import { useOrgProfile, useUpdateOrgProfile } from '@/api/organization/useOrganization'
 import { baseURL } from '@/api/axiosInstance'
 
@@ -15,8 +15,6 @@ export default function OrgProfile() {
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [form, setForm] = useState({
     orgNameAr: '',
@@ -28,8 +26,6 @@ export default function OrgProfile() {
     mapUrl: '',
     phoneNumber: '',
     email: '',
-    password: '',
-    confirmPassword: '',
   })
 
   const openEdit = () => {
@@ -44,8 +40,6 @@ export default function OrgProfile() {
         mapUrl: profile.mapUrl ?? '',
         phoneNumber: profile.phoneNumber ?? '',
         email: profile.email ?? '',
-        password: '',
-        confirmPassword: '',
       })
     }
     setLogoFile(null)
@@ -280,51 +274,6 @@ export default function OrgProfile() {
               />
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                PASSWORD
-              </label>
-              <div className="relative">
-                <input
-                  value={form.password}
-                  onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className="w-full h-11 px-4 pr-10 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                CONFIRM PASSWORD
-              </label>
-              <div className="relative">
-                <input
-                  value={form.confirmPassword}
-                  onChange={(e) => setForm((p) => ({ ...p, confirmPassword: e.target.value }))}
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className="w-full h-11 px-4 pr-10 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Actions */}
