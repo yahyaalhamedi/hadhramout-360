@@ -58,10 +58,11 @@ async function deleteProfileImage(): Promise<AccountProfile> {
 
 // ── Hooks ────────────────────────────────────────────────────────────
 
-export function useProfile() {
+export function useProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    enabled: options?.enabled ?? true,
   })
 }
 

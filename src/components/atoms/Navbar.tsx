@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import hadhramoutAR from '@/assets/hadhramoutAR.svg'
 import hadhramoutEN from '@/assets/hadhramoutEN.svg'
 import { Globe, CircleUserRound } from 'lucide-react'
@@ -14,7 +15,10 @@ import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { useGetRtl } from '@/lib/utils'
 import { useAuthContext } from '@/lib/AuthContext'
+import { useProfile } from '@/api/account/useAccount'
+import { baseURL } from '@/api/axiosInstance'
 import UserProfilePopover from './UserProfilePopover'
+import LogoutModal from './LogoutModal'
 
 const content: { title: string; href: string }[] = [
   { title: 'home', href: '/' },
@@ -60,80 +64,94 @@ const Navbar = () => {
   const isRtl = useGetRtl()
   const logo = isRtl ? hadhramoutAR : hadhramoutEN
 
-  const { isLoggedIn, userName, userEmail, roles, isAdmin } = useAuthContext()
+  const { isLoggedIn, userName, userEmail, roles, isAdmin, logout } = useAuthContext()
+  const { data: profile } = useProfile({ enabled: isLoggedIn })
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+
+  const handleLogoutConfirm = () => {
+    logout()
+    setShowLogoutModal(false)
+    navigate('/')
+  }
 
   const toggleLanguage = () => {
     void i18n.changeLanguage(isRtl ? 'en' : 'ar')
   }
 
   return (
-    <NavigationMenu dir={isRtl ? 'rtl' : 'ltr'}>
-      <NavigationMenuList className="flex w-screen items-center justify-between gap-4 px-10 py-5">
-        <NavigationMenuItem>
-          <NavLink to="/">
-            <img
-              src={logo}
-              alt="Hadhramout 360"
-              className="h-8 w-[220px]"
-            />
-          </NavLink>
-        </NavigationMenuItem>
+    <>
+      <NavigationMenu dir={isRtl ? 'rtl' : 'ltr'}>
+        <NavigationMenuList className="flex w-screen items-center justify-between gap-4 px-10 py-5">
+          <NavigationMenuItem>
+            <NavLink to="/">
+              <img
+                src={logo}
+                alt="Hadhramout 360"
+                className="h-8 w-[220px]"
+              />
+            </NavLink>
+          </NavigationMenuItem>
 
-        <NavigationMenuItem className="flex items-center gap-5">
-          {content.map((item) => (
-            <NavMenuItem
-              key={item.href}
-              title={t(item.title)}
-              href={item.href}
-            />
-          ))}
-        </NavigationMenuItem>
+          <NavigationMenuItem className="flex items-center gap-5">
+            {content.map((item) => (
+              <NavMenuItem
+                key={item.href}
+                title={t(item.title)}
+                href={item.href}
+              />
+            ))}
+          </NavigationMenuItem>
 
-        <NavigationMenuItem className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            onClick={toggleLanguage}
-          >
-            <div className="flex gap-2">
-              <Label>{isRtl ? 'EN' : 'AR'}</Label>
-              <Globe />
-            </div>
-          </Button>
+          <NavigationMenuItem className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              onClick={toggleLanguage}
+            >
+              <div className="flex gap-2">
+                <Label>{isRtl ? 'EN' : 'AR'}</Label>
+                <Globe />
+              </div>
+            </Button>
 
-          {isLoggedIn ? (
-            <div className="relative group py-2">
+            {isLoggedIn ? (
+              <div className="relative group py-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="cursor-pointer"
+                >
+                  <CircleUserRound className="text-[#0a5c66] h-6 w-6" />
+                </Button>
+                <div className={`absolute top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 ${isRtl ? 'left-0' : 'right-0'}`}>
+                  <UserProfilePopover
+                    userName={profile?.fullName || userName}
+                    userEmail={userEmail}
+                    avatarUrl={profile?.profileImageUrl ? `${baseURL}${profile.profileImageUrl}` : undefined}
+                    isAdmin={isAdmin}
+                    roles={roles}
+                    onLogoutRequest={() => setShowLogoutModal(true)}
+                  />
+                </div>
+              </div>
+            ) : (
               <Button
                 variant="ghost"
                 size="icon"
-                className="cursor-pointer"
+                onClick={() => navigate('/auth?mode=login')}
               >
-                <CircleUserRound className="text-[#0a5c66] h-6 w-6" />
+                <CircleUserRound />
               </Button>
-              {/* Fade-in transform Popover container */}
-              <div className={`absolute top-full mt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 ${isRtl ? 'left-0' : 'right-0'}`}>
-                <UserProfilePopover
-                  userName={userName}
-                  userEmail={userEmail}
-                  isAdmin={isAdmin}
-                  roles={roles}
-                  onLogoutSuccess={() => {
-                    navigate('/')
-                  }}
-                />
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/auth?mode=login')}
-            >
-              <CircleUserRound />
-            </Button>
-          )}
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+            )}
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+
+      <LogoutModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+      />
+    </>
   )
 }
 

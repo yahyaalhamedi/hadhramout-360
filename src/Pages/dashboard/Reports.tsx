@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { Shield, Trash2, XCircle } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Shield, Trash2, XCircle, AlertTriangle, FileText, User } from 'lucide-react'
 import {
   useCommunityPostReports,
   useDismissReport,
@@ -8,6 +8,8 @@ import {
 import type { CommunityPostReportResponseDto } from '@/api/admin/useCommunityPostReports.types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { baseURL } from '@/api/axiosInstance'
+import ReportModal from '@/components/atoms/ReportModal'
+import DeletePostModal from '@/components/atoms/DeletePostModal'
 
 function getInitials(name: string | null) {
   if (!name) return '?'
@@ -46,6 +48,11 @@ export default function Reports() {
   const dismissMutation = useDismissReport()
   const deletePostMutation = useDeleteReportedPost()
 
+  const [dismissModalOpen, setDismissModalOpen] = useState(false)
+  const [dismissReportId, setDismissReportId] = useState<number | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteReportId, setDeleteReportId] = useState<number | null>(null)
+
   const reports = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
   }, [data])
@@ -53,13 +60,35 @@ export default function Reports() {
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
 
   const handleDismiss = (reportId: number) => {
-    if (!confirm('Are you sure you want to dismiss this report?')) return
-    dismissMutation.mutate(reportId)
+    setDismissReportId(reportId)
+    setDismissModalOpen(true)
+  }
+
+  const handleDismissConfirm = () => {
+    if (dismissReportId !== null) {
+      dismissMutation.mutate(dismissReportId, {
+        onSuccess: () => {
+          setDismissModalOpen(false)
+          setDismissReportId(null)
+        },
+      })
+    }
   }
 
   const handleDeletePost = (reportId: number) => {
-    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) return
-    deletePostMutation.mutate(reportId)
+    setDeleteReportId(reportId)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteReportId !== null) {
+      deletePostMutation.mutate(deleteReportId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteReportId(null)
+        },
+      })
+    }
   }
 
   return (
@@ -101,106 +130,116 @@ export default function Reports() {
         </div>
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {reports.map((report: CommunityPostReportResponseDto) => (
               <div
                 key={report.reportId}
                 className="bg-white rounded-2xl shadow-sm border border-slate-100/80 hover:shadow-md transition-shadow overflow-hidden"
               >
-                {/* Reporter Info */}
-                <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-                  <Avatar size="lg">
-                    <AvatarImage
-                      src={getProfileImage(report.reportedBy.profileImageUrl)}
-                      alt={report.reportedBy.fullName ?? ''}
-                    />
-                    <AvatarFallback className="bg-slate-200 text-slate-600 text-sm font-medium">
-                      {getInitials(report.reportedBy.fullName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-slate-800">
-                      {report.reportedBy.fullName ?? 'Unknown User'}
-                    </p>
-                    <p className="text-[12px] text-slate-400">Reported {timeAgo(report.createdAt)}</p>
-                  </div>
-                </div>
-
-                {/* Report Reason */}
-                {report.reason && (
-                  <div className="px-6 pb-3">
-                    <div className="bg-amber-50 rounded-lg px-4 py-2.5">
-                      <p className="text-[12px] font-semibold text-amber-700 uppercase tracking-wide mb-0.5">Reason</p>
-                      <p className="text-[13px] text-amber-800">{report.reason}</p>
+                <div className="flex flex-col md:flex-row">
+                  {/* Left: Reported Post */}
+                  <div className="flex-1 p-6 border-b md:border-b-0 md:border-r border-slate-100">
+                    <div className="flex items-center gap-2 mb-4">
+                      <FileText className="h-4 w-4 text-slate-400" />
+                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Reported Post</span>
                     </div>
-                  </div>
-                )}
-
-                {/* Reported Post Preview */}
-                <div className="mx-6 mb-4 bg-slate-50 rounded-xl px-5 py-4 border border-slate-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Avatar>
-                      <AvatarImage
-                        src={getProfileImage(report.reportedPost.user.profileImageUrl)}
-                        alt={report.reportedPost.user.fullName ?? ''}
-                      />
-                      <AvatarFallback className="bg-slate-200 text-slate-600 text-xs">
-                        {getInitials(report.reportedPost.user.fullName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-[13px] font-medium text-slate-600">
-                      {report.reportedPost.user.fullName ?? 'Unknown'}
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      · {timeAgo(report.reportedPost.createdAt)}
-                    </span>
-                  </div>
-                  <p className="text-[13px] text-slate-700 leading-relaxed line-clamp-3">
-                    {report.reportedPost.contentText ?? 'No text content'}
-                  </p>
-                  {report.reportedPost.media && report.reportedPost.media.length > 0 && (
-                    <div className="flex gap-2 mt-3">
-                      {report.reportedPost.media.slice(0, 3).map((m) => (
-                        <div
-                          key={m.mediaId}
-                          className="w-16 h-16 rounded-lg bg-slate-200 overflow-hidden"
-                        >
-                          {m.mediaUrl && (
-                            <img
-                              src={m.mediaUrl.startsWith('http') ? m.mediaUrl : `${baseURL}${m.mediaUrl}`}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          )}
+                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar>
+                          <AvatarImage
+                            src={getProfileImage(report.reportedPost.user.profileImageUrl)}
+                            alt={report.reportedPost.user.fullName ?? ''}
+                          />
+                          <AvatarFallback className="bg-slate-200 text-slate-600 text-xs">
+                            {getInitials(report.reportedPost.user.fullName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-[14px] font-semibold text-slate-800">
+                            {report.reportedPost.user.fullName ?? 'Unknown'}
+                          </p>
+                          <p className="text-[11px] text-slate-400">{timeAgo(report.reportedPost.createdAt)}</p>
                         </div>
-                      ))}
-                      {report.reportedPost.media.length > 3 && (
-                        <div className="w-16 h-16 rounded-lg bg-slate-200 flex items-center justify-center text-[11px] text-slate-500 font-medium">
-                          +{report.reportedPost.media.length - 3}
+                      </div>
+                      <p className="text-[13px] text-slate-700 leading-relaxed line-clamp-4">
+                        {report.reportedPost.contentText ?? 'No text content'}
+                      </p>
+                      {report.reportedPost.media && report.reportedPost.media.length > 0 && (
+                        <div className="flex gap-2 mt-3">
+                          {report.reportedPost.media.slice(0, 4).map((m) => (
+                            <div
+                              key={m.mediaId}
+                              className="w-20 h-20 rounded-lg bg-slate-200 overflow-hidden"
+                            >
+                              {m.mediaUrl && (
+                                <img
+                                  src={m.mediaUrl.startsWith('http') ? m.mediaUrl : `${baseURL}${m.mediaUrl}`}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                            </div>
+                          ))}
+                          {report.reportedPost.media.length > 4 && (
+                            <div className="w-20 h-20 rounded-lg bg-slate-200 flex items-center justify-center text-[12px] text-slate-500 font-medium">
+                              +{report.reportedPost.media.length - 4}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Actions */}
-                <div className="px-6 pb-5 flex gap-3">
-                  <button
-                    onClick={() => handleDismiss(report.reportId)}
-                    disabled={dismissMutation.isPending}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <XCircle className="h-4 w-4" />
-                    Dismiss Report
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(report.reportId)}
-                    disabled={deletePostMutation.isPending}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-[13px] font-medium text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete Post
-                  </button>
+                  {/* Right: Reported By + Reason */}
+                  <div className="w-full md:w-[320px] p-6 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                      <User className="h-4 w-4 text-slate-400" />
+                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Reported By</span>
+                    </div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar>
+                        <AvatarImage
+                          src={getProfileImage(report.reportedBy.profileImageUrl)}
+                          alt={report.reportedBy.fullName ?? ''}
+                        />
+                        <AvatarFallback className="bg-slate-200 text-slate-600 text-xs">
+                          {getInitials(report.reportedBy.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="text-[14px] font-semibold text-slate-800">
+                        {report.reportedBy.fullName ?? 'Unknown User'}
+                      </p>
+                    </div>
+
+                    {report.reason && (
+                      <div className="bg-amber-50 rounded-xl px-4 py-3 mb-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <AlertTriangle className="h-4 w-4 text-amber-600" />
+                          <span className="text-[12px] font-semibold text-amber-700 uppercase tracking-wider">Reason</span>
+                        </div>
+                        <p className="text-[13px] text-amber-800 leading-relaxed">{report.reason}</p>
+                      </div>
+                    )}
+
+                    <div className="mt-auto flex gap-3">
+                      <button
+                        onClick={() => handleDismiss(report.reportId)}
+                        disabled={dismissMutation.isPending}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        <XCircle className="h-4 w-4" />
+                        Dismiss Report
+                      </button>
+                      <button
+                        onClick={() => handleDeletePost(report.reportId)}
+                        disabled={deletePostMutation.isPending}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-50 text-[13px] font-medium text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete Post
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -224,6 +263,16 @@ export default function Reports() {
           </p>
         </>
       )}
+
+      <DeletePostModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false)
+          setDeleteReportId(null)
+        }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deletePostMutation.isPending}
+      />
     </>
   )
 }

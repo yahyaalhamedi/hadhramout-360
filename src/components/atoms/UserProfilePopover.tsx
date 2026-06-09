@@ -12,7 +12,7 @@ interface UserProfilePopoverProps {
   avatarUrl?: string
   isAdmin?: boolean
   roles?: Role[]
-  onLogoutSuccess: () => void
+  onLogoutRequest: () => void
 }
 
 export default function UserProfilePopover({
@@ -21,17 +21,10 @@ export default function UserProfilePopover({
   userPhone,
   avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
   roles = [],
-  onLogoutSuccess,
+  onLogoutRequest,
 }: UserProfilePopoverProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { logout } = useAuthContext()
-
-  const handleLogoutClick = () => {
-    logout()
-    onLogoutSuccess()
-    navigate('/')
-  }
 
   const showDashboard = hasAnyRole(roles, [Roles.Admin, Roles.ContentManager])
   const showOrgPanel = hasAnyRole(roles, [Roles.Organization])
@@ -119,7 +112,7 @@ export default function UserProfilePopover({
 
         {/* Logout */}
         <button
-          onClick={handleLogoutClick}
+          onClick={onLogoutRequest}
           className="w-full h-12 rounded-2xl bg-[#f5d6d6] hover:bg-[#f1c5c5] text-red-600 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors duration-200 mt-1"
         >
           <LogOut className="h-4 w-4" />
