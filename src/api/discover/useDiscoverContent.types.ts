@@ -45,6 +45,7 @@ export interface DiscoverParams {
   search?: string
   pageNumber: number
   pageSize: number
+  category?: string
 }
 
 export interface CreateDiscoverContentParams {

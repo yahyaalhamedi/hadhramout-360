@@ -22,30 +22,30 @@ export default function DiscoverCard({
 
   return (
     <div
-      className={`group cursor-pointer overflow-hidden rounded-[24px] bg-white transition-shadow hover:shadow-lg ${className}`}
+      className={`group relative h-[520px] w-full cursor-pointer overflow-hidden rounded-[40px] ${className}`}
       onClick={onClick}
     >
-      {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[24px]">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
+      {/* Background Image */}
+      <img
+        src={image}
+        alt={title}
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
 
-      {/* Info */}
-      <div className="px-1 pt-4 pb-2">
-        <h3 className="mb-3 line-clamp-2 text-lg font-bold text-secondary-8">{title}</h3>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+      {/* Content */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col p-5">
+        {/* Title */}
+        <h2 className="mb-8 text-4xl font-bold leading-tight text-white">{title}</h2>
+
+        {/* Button */}
         <button
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-secondary-6 bg-white py-3 text-sm font-semibold text-secondary-8 transition-colors hover:bg-secondary-2 cursor-pointer"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#F3E7D7] text-lg font-semibold text-[#B98B4A] transition-colors hover:bg-[#F3E7D7]/90 cursor-pointer"
         >
           {t('label.view_details')}
-          {isRtl ? (
-            <ArrowLeft className="h-4 w-4" />
-          ) : (
-            <ArrowRight className="h-4 w-4" />
-          )}
+          {isRtl ? <ArrowLeft className="ml-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
         </button>
       </div>
     </div>

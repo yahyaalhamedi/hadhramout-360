@@ -12,10 +12,21 @@ import type {
 
 type UseDiscoverParams = Omit<DiscoverParams, 'pageNumber'>
 
+// ── Category to endpoint mapping ──────────────────────────────────
+const CATEGORY_ENDPOINT_MAP: Record<string, string> = {
+  culture: 'culture',
+  food: 'food',
+  games: 'games',
+}
+
 // ── Fetch functions ───────────────────────────────────────────────
 
 async function fetchDiscoverContent(params: DiscoverParams): Promise<DiscoverData> {
-  const { data } = await axiosInstance.get<DiscoverApiResponse>('/api/discover-content', {
+  const endpoint = params.category
+    ? `/api/discover-content/${CATEGORY_ENDPOINT_MAP[params.category] ?? params.category}`
+    : '/api/discover-content'
+
+  const { data } = await axiosInstance.get<DiscoverApiResponse>(endpoint, {
     params: {
       PageNumber: params.pageNumber,
       PageSize: params.pageSize,
@@ -65,11 +76,11 @@ async function deleteDiscoverContent(id: number): Promise<{ success: boolean }> 
 
 // ── Hooks ─────────────────────────────────────────────────────────
 
-export function useDiscoverContent({ search, pageSize }: UseDiscoverParams) {
+export function useDiscoverContent({ search, pageSize, category }: UseDiscoverParams) {
   return useInfiniteQuery({
-    queryKey: ['discover-content', { search, pageSize }],
+    queryKey: ['discover-content', { search, pageSize, category }],
     queryFn: ({ pageParam }) =>
-      fetchDiscoverContent({ pageNumber: pageParam, pageSize, search }),
+      fetchDiscoverContent({ pageNumber: pageParam, pageSize, search, category }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.pagination.nextPage ?? undefined,
     getPreviousPageParam: (firstPage) => firstPage.pagination.previousPage ?? undefined,

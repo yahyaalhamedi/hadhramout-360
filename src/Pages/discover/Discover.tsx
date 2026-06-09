@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search } from 'lucide-react'
-import { UtensilsCrossed, Landmark, Gamepad2 } from 'lucide-react'
+import { Search, Landmark, UtensilsCrossed, Gamepad2, Globe, type LucideIcon } from 'lucide-react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { Input } from '@/components/ui/input'
 import DiscoverCard from '@/components/atoms/DiscoverCard'
@@ -8,22 +7,20 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useGetRtl } from '@/lib/utils'
 import { useDiscoverContent } from '@/api/discover/useDiscoverContent'
-import type { DiscoverContentCategory } from '@/api/discover/useDiscoverContent.types'
 import { cn } from '@/lib/utils'
 
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
 
-type TabKey = 'all' | DiscoverContentCategory
-
+// ── Fixed categories matching API endpoints ────────────────────────
 interface Tab {
-  key: TabKey
-  icon: typeof Landmark
+  key: string
+  icon: LucideIcon
   labelAr: string
   labelEn: string
 }
 
-const TABS: Tab[] = [
+const CATEGORY_TABS: Tab[] = [
   { key: 'culture', icon: Landmark, labelAr: 'ثقافة', labelEn: 'Culture' },
   { key: 'food', icon: UtensilsCrossed, labelAr: 'طعام', labelEn: 'Food' },
   { key: 'games', icon: Gamepad2, labelAr: 'ألعاب', labelEn: 'Games' },
@@ -36,7 +33,7 @@ const Discover = () => {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [activeTab, setActiveTab] = useState<TabKey>('all')
+  const [activeTab, setActiveTab] = useState<string>('all')
 
   const { data, fetchNextPage, hasNextPage, isFetching, isError } = useDiscoverContent({
     pageSize: 9,
@@ -100,7 +97,7 @@ const Discover = () => {
 
       {/* Category Tabs */}
       <div className="mt-16 px-4">
-        <div className="flex items-center justify-center gap-8">
+        <div className="flex items-center justify-center gap-8 flex-wrap">
           <button
             onClick={() => setActiveTab('all')}
             className={cn(
@@ -114,12 +111,12 @@ const Discover = () => {
                 activeTab === 'all' ? 'border-secondary-8 bg-secondary-1' : 'border-muted-foreground/30 bg-white',
               )}
             >
-              <Landmark className="h-7 w-7" />
+              <Globe className="h-7 w-7" />
             </div>
             <span className="text-xs font-medium">{t('label.all')}</span>
           </button>
 
-          {TABS.map((tab) => {
+          {CATEGORY_TABS.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.key
             const label = isRtl ? tab.labelAr : tab.labelEn
@@ -167,7 +164,7 @@ const Discover = () => {
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-[340px] animate-pulse rounded-[24px] bg-muted"
+                  className="h-[520px] animate-pulse rounded-[40px] bg-muted"
                 />
               ))}
             </div>
@@ -209,7 +206,7 @@ const Discover = () => {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-[340px] animate-pulse rounded-[24px] bg-muted"
+                className="h-[520px] animate-pulse rounded-[40px] bg-muted"
               />
             ))}
           </div>
