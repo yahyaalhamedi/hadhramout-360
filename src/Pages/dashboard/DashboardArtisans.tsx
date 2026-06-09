@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, Trash2, Plus, Pencil, Upload } from 'lucide-react'
 import {
   useArtisans,
@@ -26,6 +27,7 @@ const emptyForm = {
 }
 
 export default function DashboardArtisans() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -100,7 +102,7 @@ export default function DashboardArtisans() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm('Are you sure you want to delete this artisan?')) return
+    if (!confirm(t('dashboard.artisans.delete_confirm'))) return
     deleteMutation.mutate(id)
   }
 
@@ -108,14 +110,14 @@ export default function DashboardArtisans() {
     <>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
-          ARTISANS
+          {t('dashboard.artisans.title')}
         </h2>
         <button
           onClick={openCreate}
           className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          New Artisan
+          {t('dashboard.artisans.new')}
         </button>
       </div>
 
@@ -123,7 +125,7 @@ export default function DashboardArtisans() {
         <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search artisans..."
+          placeholder={t('dashboard.artisans.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-12 pl-5 pr-12 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 transition-all"
@@ -144,7 +146,7 @@ export default function DashboardArtisans() {
         </div>
       ) : artisans.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100/80 text-center">
-          <p className="text-slate-500 text-[14px]">No artisans found.</p>
+          <p className="text-slate-500 text-[14px]">{t('dashboard.artisans.no_results')}</p>
         </div>
       ) : (
         <>
@@ -158,18 +160,18 @@ export default function DashboardArtisans() {
                   {a.coverImageUrl ? (
                     <img src={getImageUrl(a.coverImageUrl)} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">{t('dashboard.artisans.no_img')}</div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-slate-800 truncate">
-                    {a.nameEn || a.nameAr || 'Untitled'}
+                    {a.nameEn || a.nameAr || t('dashboard.artisans.untitled')}
                   </p>
                 </div>
-                <button onClick={() => openEdit(a)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title="Edit">
+                <button onClick={() => openEdit(a)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title={t('dashboard.common.edit')}>
                   <Pencil className="h-5 w-5" />
                 </button>
-                <button onClick={() => handleDelete(a.artisanId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title="Delete">
+                <button onClick={() => handleDelete(a.artisanId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title={t('dashboard.common.delete')}>
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
@@ -179,12 +181,12 @@ export default function DashboardArtisans() {
           {hasNextPage && (
             <div className="flex justify-center mt-6">
               <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer">
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('dashboard.common.loading') : t('dashboard.common.load_more')}
               </button>
             </div>
           )}
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {artisans.length} of {totalCount} artisans
+            {t('dashboard.artisans.showing', { count: artisans.length, total: totalCount })}
           </p>
         </>
       )}
@@ -192,61 +194,61 @@ export default function DashboardArtisans() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-slate-900 mb-6">{editingId ? 'Edit Artisan' : 'New Artisan'}</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-6">{editingId ? t('dashboard.artisans.edit') : t('dashboard.artisans.create')}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Name (AR) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.name_ar')}</label>
                   <input value={form.nameAr} onChange={(e) => setForm((p) => ({ ...p, nameAr: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Name (EN) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.name_en')}</label>
                   <input value={form.nameEn} onChange={(e) => setForm((p) => ({ ...p, nameEn: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Phone *</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.phone')}</label>
                 <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Description (AR) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.desc_ar')}</label>
                   <textarea value={form.descriptionAr} onChange={(e) => setForm((p) => ({ ...p, descriptionAr: e.target.value }))} rows={3} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Description (EN) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.desc_en')}</label>
                   <textarea value={form.descriptionEn} onChange={(e) => setForm((p) => ({ ...p, descriptionEn: e.target.value }))} rows={3} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Location (AR)</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.location_ar')}</label>
                   <input value={form.locationTextAr} onChange={(e) => setForm((p) => ({ ...p, locationTextAr: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Location (EN)</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.location_en')}</label>
                   <input value={form.locationTextEn} onChange={(e) => setForm((p) => ({ ...p, locationTextEn: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Map URL</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.map_url')}</label>
                 <input value={form.mapUrl} onChange={(e) => setForm((p) => ({ ...p, mapUrl: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" placeholder="https://maps.google.com/..." />
               </div>
               {!editingId && (
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Media Files</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.artisans.media_files')}</label>
                   <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => setFiles(Array.from(e.target.files ?? []))} className="hidden" />
                   <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-10 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2">
                     <Upload className="h-4 w-4" />
-                    {files.length > 0 ? `${files.length} file(s) selected` : 'Choose files...'}
+                    {files.length > 0 ? t('dashboard.artisans.files_selected', { count: files.length }) : t('dashboard.artisans.choose_files')}
                   </button>
                 </div>
               )}
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => { setShowModal(false); setEditingId(null); setForm(emptyForm); setFiles([]) }} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
+              <button onClick={() => { setShowModal(false); setEditingId(null); setForm(emptyForm); setFiles([]) }} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">{t('dashboard.common.cancel')}</button>
               <button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer">
-                {createMutation.isPending || updateMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
+                {createMutation.isPending || updateMutation.isPending ? t('dashboard.common.saving') : editingId ? t('dashboard.common.update') : t('dashboard.common.create')}
               </button>
             </div>
           </div>

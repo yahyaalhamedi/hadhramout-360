@@ -1,5 +1,6 @@
 import { useRef } from 'react'
-import { Calendar, MapPin, Upload, CloudUpload, X, ImageIcon, Trash2, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Calendar, MapPin, Upload, CloudUpload, X, ImageIcon, Trash2 } from 'lucide-react'
 import RichTextEditor from './RichTextEditor'
 import type { EventMediaResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
@@ -61,7 +62,6 @@ export default function EventFormModal({
   isPending,
   onSubmit,
   onClose,
-  coverFile,
   setCoverFile,
   coverPreview,
   mediaFiles,
@@ -72,6 +72,7 @@ export default function EventFormModal({
   isAddingMedia,
   isDeletingMedia,
 }: EventFormModalProps) {
+  const { t } = useTranslation()
   const coverInputRef = useRef<HTMLInputElement>(null)
   const mediaInputRef = useRef<HTMLInputElement>(null)
 
@@ -106,7 +107,7 @@ export default function EventFormModal({
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-[#0a5c66]" />
-            {editingId ? 'Edit Event' : 'Create Event'}
+            {editingId ? t('dashboard.event_form.edit_event') : t('dashboard.event_form.create_event')}
           </h3>
           <button
             onClick={onClose}
@@ -135,8 +136,8 @@ export default function EventFormModal({
             ) : (
               <>
                 <CloudUpload className="h-10 w-10 text-slate-400" />
-                <span className="text-[14px] font-medium">Upload Event Image</span>
-                <span className="text-[12px] text-slate-400">PNG, JPG up to 5MB</span>
+                <span className="text-[14px] font-medium">{t('dashboard.event_form.upload_image')}</span>
+                <span className="text-[12px] text-slate-400">{t('dashboard.event_form.image_hint')}</span>
               </>
             )}
           </button>
@@ -147,11 +148,11 @@ export default function EventFormModal({
           <div className="grid grid-cols-2 gap-4 mb-2">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-[#0a5c66] text-white text-[11px] font-bold">EN</span>
-              <span className="text-[14px] font-semibold text-slate-700">English Details</span>
+              <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.english_details')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-[#0a5c66] text-white text-[11px] font-bold">AR</span>
-              <span className="text-[14px] font-semibold text-slate-700">Arabic Details</span>
+              <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.arabic_details')}</span>
             </div>
           </div>
 
@@ -159,23 +160,23 @@ export default function EventFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Event Title (EN)
+                {t('dashboard.event_form.title_en')}
               </label>
               <input
                 value={form.titleEn}
                 onChange={(e) => setForm((p) => ({ ...p, titleEn: e.target.value }))}
-                placeholder="e.g. Shibam Sunset Pottery Workshop"
+                placeholder={t('dashboard.event_form.title_en_placeholder')}
                 className="w-full h-11 px-4 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
               />
             </div>
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Event Title (AR)
+                {t('dashboard.event_form.title_ar')}
               </label>
               <input
                 value={form.titleAr}
                 onChange={(e) => setForm((p) => ({ ...p, titleAr: e.target.value }))}
-                placeholder="مثال: ورشة فخار غروب شيبام"
+                placeholder={t('dashboard.event_form.title_ar_placeholder')}
                 dir="rtl"
                 className="w-full h-11 px-4 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
               />
@@ -186,22 +187,22 @@ export default function EventFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Description (EN)
+                {t('dashboard.event_form.desc_en')}
               </label>
               <RichTextEditor
                 value={form.descriptionEn}
                 onChange={(val) => setForm((p) => ({ ...p, descriptionEn: val }))}
-                placeholder="Tell the story of this event..."
+                placeholder={t('dashboard.event_form.desc_en_placeholder')}
               />
             </div>
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Description (AR)
+                {t('dashboard.event_form.desc_ar')}
               </label>
               <RichTextEditor
                 value={form.descriptionAr}
                 onChange={(val) => setForm((p) => ({ ...p, descriptionAr: val }))}
-                placeholder="اكتب قصة هذا الحدث..."
+                placeholder={t('dashboard.event_form.desc_ar_placeholder')}
                 dir="rtl"
               />
             </div>
@@ -210,13 +211,13 @@ export default function EventFormModal({
           {/* Schedule */}
           <div className="flex items-center gap-2 mt-6 mb-2">
             <Calendar className="h-4 w-4 text-[#0a5c66]" />
-            <span className="text-[14px] font-semibold text-slate-700">Schedule</span>
+            <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.schedule')}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Start Date
+                {t('dashboard.event_form.start_date')}
               </label>
               <input
                 type="date"
@@ -227,7 +228,7 @@ export default function EventFormModal({
             </div>
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                End Date
+                {t('dashboard.event_form.end_date')}
               </label>
               <input
                 type="date"
@@ -241,29 +242,29 @@ export default function EventFormModal({
           {/* Location */}
           <div className="flex items-center gap-2 mt-6 mb-2">
             <MapPin className="h-4 w-4 text-[#0a5c66]" />
-            <span className="text-[14px] font-semibold text-slate-700">Location Details</span>
+            <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.location_details')}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Address (EN)
+                {t('dashboard.event_form.address_en')}
               </label>
               <input
                 value={form.addressEn}
                 onChange={(e) => setForm((p) => ({ ...p, addressEn: e.target.value }))}
-                placeholder="e.g. Al-Omar Heritage Square"
+                placeholder={t('dashboard.event_form.address_en_placeholder')}
                 className="w-full h-11 px-4 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
               />
             </div>
             <div>
               <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                Address (AR)
+                {t('dashboard.event_form.address_ar')}
               </label>
               <input
                 value={form.addressAr}
                 onChange={(e) => setForm((p) => ({ ...p, addressAr: e.target.value }))}
-                placeholder="مثال: ساحة عمر التراثية"
+                placeholder={t('dashboard.event_form.address_ar_placeholder')}
                 dir="rtl"
                 className="w-full h-11 px-4 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
               />
@@ -272,7 +273,7 @@ export default function EventFormModal({
 
           <div>
             <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-              Google Maps URL
+              {t('dashboard.event_form.google_maps_url')}
             </label>
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -287,12 +288,12 @@ export default function EventFormModal({
 
           {/* Registration */}
           <div className="flex items-center gap-2 mt-6 mb-2">
-            <span className="text-[14px] font-semibold text-slate-700">Registration Link</span>
+            <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.registration_link')}</span>
           </div>
 
           <div>
             <label className="block text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-              Registration Form URL
+              {t('dashboard.event_form.registration_form_url')}
             </label>
             <input
               value={form.formUrl}
@@ -301,14 +302,14 @@ export default function EventFormModal({
               className="w-full h-11 px-4 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 bg-[#f8f9fa]"
             />
             <p className="text-[12px] text-slate-400 mt-1">
-              Add an external registration or participation form link if available.
+              {t('dashboard.event_form.registration_hint')}
             </p>
           </div>
 
           {/* Media Gallery */}
           <div className="flex items-center gap-2 mt-6 mb-2">
             <ImageIcon className="h-4 w-4 text-[#0a5c66]" />
-            <span className="text-[14px] font-semibold text-slate-700">Media Gallery</span>
+            <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.media_gallery')}</span>
             {editingId && existingMedia && existingMedia.length > 0 && (
               <span className="text-[12px] text-slate-400">({existingMedia.length})</span>
             )}
@@ -379,7 +380,7 @@ export default function EventFormModal({
             className="w-full h-11 px-3 rounded-xl border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2"
           >
             <Upload className="h-4 w-4" />
-            {isAddingMedia ? 'Uploading...' : 'Add Media'}
+            {isAddingMedia ? t('dashboard.event_form.uploading') : t('dashboard.event_form.add_media')}
           </button>
         </div>
 
@@ -390,13 +391,13 @@ export default function EventFormModal({
             disabled={isPending}
             className="w-full h-12 rounded-xl bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {isPending ? 'Saving...' : editingId ? 'UPDATE EVENT' : 'CREATE EVENT'}
+            {isPending ? t('dashboard.common.saving') : editingId ? t('dashboard.event_form.update_event') : t('dashboard.event_form.create_event_btn')}
           </button>
           <button
             onClick={onClose}
             className="w-full h-12 rounded-xl border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            Cancel
+            {t('dashboard.common.cancel')}
           </button>
         </div>
       </div>

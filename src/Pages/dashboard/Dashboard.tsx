@@ -1,30 +1,32 @@
-import { LayoutDashboard, MapPin, Calendar, PenTool, Compass, Users, Building2, AlertCircle, Landmark, FolderOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { LayoutDashboard, Calendar, PenTool, Compass, Users, Building2, AlertCircle, Landmark, FolderOpen } from 'lucide-react'
 import { useDashboardStats } from '@/api/admin/useDashboardStats'
 
 const Dashboard = () => {
+  const { t } = useTranslation()
   const { data: stats, isLoading, isError } = useDashboardStats()
 
   const statCards = stats
     ? [
-        { label: 'Users', value: stats.usersCount, icon: Users, iconBg: 'bg-teal-100', iconColor: 'text-teal-700' },
-        { label: 'Organizations', value: stats.organizationsCount, icon: Building2, iconBg: 'bg-amber-100', iconColor: 'text-amber-700' },
-        { label: 'Reports', value: stats.reportsCount, icon: AlertCircle, iconBg: 'bg-rose-100', iconColor: 'text-rose-600' },
-        { label: 'Landmarks', value: stats.landmarksCount, icon: Landmark, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-        { label: 'Events', value: stats.eventsCount, icon: Calendar, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-        { label: 'Artisans', value: stats.artisansCount, icon: PenTool, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-        { label: 'Discover', value: stats.discoverContentCount, icon: Compass, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-        { label: 'Community Posts', value: stats.communityPostsCount, icon: FolderOpen, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
-        { label: 'Total Content', value: stats.totalContentCount, icon: LayoutDashboard, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.users'), value: stats.usersCount, icon: Users, iconBg: 'bg-teal-100', iconColor: 'text-teal-700' },
+        { label: t('dashboard.stats.organizations'), value: stats.organizationsCount, icon: Building2, iconBg: 'bg-amber-100', iconColor: 'text-amber-700' },
+        { label: t('dashboard.stats.reports'), value: stats.reportsCount, icon: AlertCircle, iconBg: 'bg-rose-100', iconColor: 'text-rose-600' },
+        { label: t('dashboard.stats.landmarks'), value: stats.landmarksCount, icon: Landmark, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.events'), value: stats.eventsCount, icon: Calendar, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.artisans'), value: stats.artisansCount, icon: PenTool, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.discover'), value: stats.discoverContentCount, icon: Compass, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.community_posts'), value: stats.communityPostsCount, icon: FolderOpen, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
+        { label: t('dashboard.stats.total_content'), value: stats.totalContentCount, icon: LayoutDashboard, iconBg: 'bg-slate-100', iconColor: 'text-slate-600' },
       ]
     : []
 
   return (
     <>
       <h2 className="text-[40px] font-bold text-slate-900 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-        WELCOME
+        {t('dashboard.welcome')}
       </h2>
       <p className="text-slate-500 text-[14px] mb-10 max-w-lg leading-relaxed">
-        Manage and monitor the Digital Oasis ecosystem from one centralized administration workspace.
+        {t('dashboard.welcome_desc')}
       </p>
 
       {/* Stats Grid */}
@@ -42,7 +44,7 @@ const Dashboard = () => {
           : isError
             ? (
               <div className="col-span-full text-center py-10 text-red-500">
-                Failed to load dashboard stats.
+                {t('dashboard.stats.error')}
               </div>
             )
             : statCards.map((stat) => {

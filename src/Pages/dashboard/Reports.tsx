@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Shield, Trash2, XCircle, AlertTriangle, FileText, User } from 'lucide-react'
 import {
   useCommunityPostReports,
@@ -8,7 +9,6 @@ import {
 import type { CommunityPostReportResponseDto } from '@/api/admin/useCommunityPostReports.types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { baseURL } from '@/api/axiosInstance'
-import ReportModal from '@/components/atoms/ReportModal'
 import DeletePostModal from '@/components/atoms/DeletePostModal'
 
 function getInitials(name: string | null) {
@@ -26,21 +26,8 @@ function getProfileImage(url: string | null) {
   return url.startsWith('http') ? url : `${baseURL}${url}`
 }
 
-function timeAgo(dateStr: string): string {
-  const now = new Date()
-  const date = new Date(dateStr)
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHrs = Math.floor(diffMins / 60)
-  if (diffHrs < 24) return `${diffHrs}h ago`
-  const diffDays = Math.floor(diffHrs / 24)
-  if (diffDays < 30) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
-
 export default function Reports() {
+  const { t } = useTranslation()
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useCommunityPostReports({
     pageSize: 10,
   })
@@ -48,8 +35,6 @@ export default function Reports() {
   const dismissMutation = useDismissReport()
   const deletePostMutation = useDeleteReportedPost()
 
-  const [dismissModalOpen, setDismissModalOpen] = useState(false)
-  const [dismissReportId, setDismissReportId] = useState<number | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deleteReportId, setDeleteReportId] = useState<number | null>(null)
 
@@ -60,19 +45,7 @@ export default function Reports() {
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
 
   const handleDismiss = (reportId: number) => {
-    setDismissReportId(reportId)
-    setDismissModalOpen(true)
-  }
-
-  const handleDismissConfirm = () => {
-    if (dismissReportId !== null) {
-      dismissMutation.mutate(dismissReportId, {
-        onSuccess: () => {
-          setDismissModalOpen(false)
-          setDismissReportId(null)
-        },
-      })
-    }
+    dismissMutation.mutate(reportId)
   }
 
   const handleDeletePost = (reportId: number) => {
@@ -91,16 +64,30 @@ export default function Reports() {
     }
   }
 
+  const timeAgo = (dateStr: string): string => {
+    const now = new Date()
+    const date = new Date(dateStr)
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    if (diffMins < 1) return t('dashboard.reports.time.just_now')
+    if (diffMins < 60) return t('dashboard.reports.time.minutes_ago', { count: diffMins })
+    const diffHrs = Math.floor(diffMins / 60)
+    if (diffHrs < 24) return t('dashboard.reports.time.hours_ago', { count: diffHrs })
+    const diffDays = Math.floor(diffHrs / 24)
+    if (diffDays < 30) return t('dashboard.reports.time.days_ago', { count: diffDays })
+    return date.toLocaleDateString()
+  }
+
   return (
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
-          REPORTS
+          {t('dashboard.reports.title')}
         </h2>
         <div className="flex items-center gap-2 text-[13px] text-slate-500">
           <Shield className="h-4 w-4" />
-          <span>{totalCount} total reports</span>
+          <span>{t('dashboard.reports.total', { count: totalCount })}</span>
         </div>
       </div>
 
@@ -125,8 +112,8 @@ export default function Reports() {
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <Shield className="h-8 w-8 text-green-600" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-800 mb-1">No Reports</h3>
-          <p className="text-sm text-slate-500">There are no community post reports at this time.</p>
+          <h3 className="text-lg font-semibold text-slate-800 mb-1">{t('dashboard.reports.no_reports')}</h3>
+          <p className="text-sm text-slate-500">{t('dashboard.reports.no_reports_desc')}</p>
         </div>
       ) : (
         <>
@@ -141,7 +128,7 @@ export default function Reports() {
                   <div className="flex-1 p-6 border-b md:border-b-0 md:border-r border-slate-100">
                     <div className="flex items-center gap-2 mb-4">
                       <FileText className="h-4 w-4 text-slate-400" />
-                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Reported Post</span>
+                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">{t('dashboard.reports.reported_post')}</span>
                     </div>
                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                       <div className="flex items-center gap-3 mb-3">
@@ -194,7 +181,7 @@ export default function Reports() {
                   <div className="w-full md:w-[320px] p-6 flex flex-col">
                     <div className="flex items-center gap-2 mb-4">
                       <User className="h-4 w-4 text-slate-400" />
-                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Reported By</span>
+                      <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">{t('dashboard.reports.reported_by')}</span>
                     </div>
                     <div className="flex items-center gap-3 mb-4">
                       <Avatar>
@@ -215,7 +202,7 @@ export default function Reports() {
                       <div className="bg-amber-50 rounded-xl px-4 py-3 mb-4">
                         <div className="flex items-center gap-2 mb-1">
                           <AlertTriangle className="h-4 w-4 text-amber-600" />
-                          <span className="text-[12px] font-semibold text-amber-700 uppercase tracking-wider">Reason</span>
+                          <span className="text-[12px] font-semibold text-amber-700 uppercase tracking-wider">{t('dashboard.reports.reason')}</span>
                         </div>
                         <p className="text-[13px] text-amber-800 leading-relaxed">{report.reason}</p>
                       </div>
@@ -228,7 +215,7 @@ export default function Reports() {
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
                       >
                         <XCircle className="h-4 w-4" />
-                        Dismiss Report
+                        {t('dashboard.reports.dismiss')}
                       </button>
                       <button
                         onClick={() => handleDeletePost(report.reportId)}
@@ -236,7 +223,7 @@ export default function Reports() {
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-50 text-[13px] font-medium text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50 cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4" />
-                        Delete Post
+                        {t('dashboard.reports.delete_post')}
                       </button>
                     </div>
                   </div>
@@ -253,13 +240,13 @@ export default function Reports() {
                 disabled={isFetchingNextPage}
                 className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('dashboard.common.loading') : t('dashboard.common.load_more')}
               </button>
             </div>
           )}
 
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {reports.length} of {totalCount} reports
+            {t('dashboard.reports.showing', { count: reports.length, total: totalCount })}
           </p>
         </>
       )}

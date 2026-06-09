@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, Trash2, Pencil } from 'lucide-react'
 import {
   useEvents,
@@ -23,6 +24,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function DashboardEvents() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -99,7 +101,7 @@ export default function DashboardEvents() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm('Are you sure you want to delete this event?')) return
+    if (!confirm(t('dashboard.events.delete_confirm'))) return
     deleteMutation.mutate(id)
   }
 
@@ -136,7 +138,7 @@ export default function DashboardEvents() {
     <>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
-          EVENTS
+          {t('dashboard.events.title')}
         </h2>
       </div>
 
@@ -144,7 +146,7 @@ export default function DashboardEvents() {
         <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search events..."
+          placeholder={t('dashboard.events.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-12 pl-5 pr-12 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 transition-all"
@@ -165,7 +167,7 @@ export default function DashboardEvents() {
         </div>
       ) : events.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100/80 text-center">
-          <p className="text-slate-500 text-[14px]">No events found.</p>
+          <p className="text-slate-500 text-[14px]">{t('dashboard.events.no_results')}</p>
         </div>
       ) : (
         <>
@@ -179,24 +181,24 @@ export default function DashboardEvents() {
                   {ev.coverImageUrl ? (
                     <img src={getImageUrl(ev.coverImageUrl)} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">{t('dashboard.events.no_img')}</div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-slate-800 truncate">
-                    {ev.titleEn || ev.titleAr || 'Untitled'}
+                    {ev.titleEn || ev.titleAr || t('dashboard.events.untitled')}
                   </p>
                   <p className="text-[12px] text-slate-400 mt-0.5">
                     {formatDate(ev.startDate)} - {formatDate(ev.endDate)}
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium">
-                  {ev.organizationNameEn || ev.organizationNameAr || 'Org'}
+                  {ev.organizationNameEn || ev.organizationNameAr || t('dashboard.events.org')}
                 </span>
-                <button onClick={() => openEdit(ev)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title="Edit">
+                <button onClick={() => openEdit(ev)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title={t('dashboard.common.edit')}>
                   <Pencil className="h-5 w-5" />
                 </button>
-                <button onClick={() => handleDelete(ev.eventId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title="Delete">
+                <button onClick={() => handleDelete(ev.eventId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title={t('dashboard.common.delete')}>
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
@@ -206,12 +208,12 @@ export default function DashboardEvents() {
           {hasNextPage && (
             <div className="flex justify-center mt-6">
               <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer">
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('dashboard.common.loading') : t('dashboard.common.load_more')}
               </button>
             </div>
           )}
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {events.length} of {totalCount} events
+            {t('dashboard.events.showing', { count: events.length, total: totalCount })}
           </p>
         </>
       )}

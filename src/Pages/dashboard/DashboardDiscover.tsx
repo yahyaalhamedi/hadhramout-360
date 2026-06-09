@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, Trash2, Plus, Pencil, Upload, X, Loader2 } from 'lucide-react'
 import {
   useDiscoverContent,
@@ -24,6 +25,7 @@ const emptyForm = {
 }
 
 export default function DashboardDiscover() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -40,10 +42,8 @@ export default function DashboardDiscover() {
   const updateMutation = useUpdateDiscoverContent()
   const deleteMutation = useDeleteDiscoverContent()
 
-  // Fetch full detail for edit to get bodyAr/bodyEn
   const { data: editingDetail } = useDiscoverContentById(editingId ?? undefined)
 
-  // Populate form when editing detail loads
   useEffect(() => {
     if (editingId && editingDetail && !form.bodyAr && editingDetail.bodyAr) {
       setForm({
@@ -99,7 +99,7 @@ export default function DashboardDiscover() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm('Are you sure you want to delete this content?')) return
+    if (!confirm(t('dashboard.discover.delete_confirm'))) return
     deleteMutation.mutate(id)
   }
 
@@ -113,14 +113,14 @@ export default function DashboardDiscover() {
     <>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
-          DISCOVER
+          {t('dashboard.discover.title')}
         </h2>
         <button
           onClick={openCreate}
           className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          New Content
+          {t('dashboard.discover.new')}
         </button>
       </div>
 
@@ -128,7 +128,7 @@ export default function DashboardDiscover() {
         <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search discover content..."
+          placeholder={t('dashboard.discover.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-12 pl-5 pr-12 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 transition-all"
@@ -149,7 +149,7 @@ export default function DashboardDiscover() {
         </div>
       ) : items.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100/80 text-center">
-          <p className="text-slate-500 text-[14px]">No discover content found.</p>
+          <p className="text-slate-500 text-[14px]">{t('dashboard.discover.no_results')}</p>
         </div>
       ) : (
         <>
@@ -163,18 +163,18 @@ export default function DashboardDiscover() {
                   {item.coverImageUrl ? (
                     <img src={getImageUrl(item.coverImageUrl)} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">{t('dashboard.discover.no_img')}</div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-slate-800 truncate">
-                    {item.titleEn || item.titleAr || 'Untitled'}
+                    {item.titleEn || item.titleAr || t('dashboard.discover.untitled')}
                   </p>
                 </div>
-                <button onClick={() => openEdit(item)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title="Edit">
+                <button onClick={() => openEdit(item)} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors cursor-pointer" title={t('dashboard.common.edit')}>
                   <Pencil className="h-5 w-5" />
                 </button>
-                <button onClick={() => handleDelete(item.contentId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title="Delete">
+                <button onClick={() => handleDelete(item.contentId)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer" title={t('dashboard.common.delete')}>
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
@@ -184,12 +184,12 @@ export default function DashboardDiscover() {
           {hasNextPage && (
             <div className="flex justify-center mt-6">
               <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer">
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('dashboard.common.loading') : t('dashboard.common.load_more')}
               </button>
             </div>
           )}
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {items.length} of {totalCount} items
+            {t('dashboard.discover.showing', { count: items.length, total: totalCount })}
           </p>
         </>
       )}
@@ -198,7 +198,7 @@ export default function DashboardDiscover() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Content' : 'New Content'}</h3>
+              <h3 className="text-xl font-bold text-slate-900">{editingId ? t('dashboard.discover.edit') : t('dashboard.discover.create')}</h3>
               <button onClick={closeModal} className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
@@ -206,32 +206,32 @@ export default function DashboardDiscover() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Title (AR) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.discover.title_ar')}</label>
                   <input value={form.titleAr} onChange={(e) => setForm((p) => ({ ...p, titleAr: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Title (EN) *</label>
+                  <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.discover.title_en')}</label>
                   <input value={form.titleEn} onChange={(e) => setForm((p) => ({ ...p, titleEn: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20" />
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Body (AR) *</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.discover.body_ar')}</label>
                 <RichTextEditor
                   value={form.bodyAr}
                   onChange={(val) => setForm((p) => ({ ...p, bodyAr: val }))}
-                  placeholder="Write the Arabic content..."
+                  placeholder={t('dashboard.discover.body_ar_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Body (EN) *</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.discover.body_en')}</label>
                 <RichTextEditor
                   value={form.bodyEn}
                   onChange={(val) => setForm((p) => ({ ...p, bodyEn: val }))}
-                  placeholder="Write the English content..."
+                  placeholder={t('dashboard.discover.body_en_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Cover Image</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.discover.cover_image')}</label>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => setCoverImage(e.target.files?.[0] ?? null)} className="hidden" />
                 {coverPreview ? (
                   <div className="relative group">
@@ -247,14 +247,14 @@ export default function DashboardDiscover() {
                 ) : (
                   <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-20 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2">
                     <Upload className="h-4 w-4" />
-                    Choose cover image...
+                    {t('dashboard.discover.choose_cover')}
                   </button>
                 )}
               </div>
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={closeModal} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">
-                Cancel
+                {t('dashboard.common.cancel')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -262,7 +262,7 @@ export default function DashboardDiscover() {
                 className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
               >
                 {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin" />}
-                {createMutation.isPending || updateMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
+                {createMutation.isPending || updateMutation.isPending ? t('dashboard.common.saving') : editingId ? t('dashboard.common.update') : t('dashboard.common.create')}
               </button>
             </div>
           </div>

@@ -1,11 +1,10 @@
 import { useState, useMemo, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, Trash2, X, Upload } from 'lucide-react'
 import { useAdminUsers, useDeleteUser, useCreateContentManager } from '@/api/admin/useAdminUsers'
 import type { AdminUser } from '@/api/admin/useAdminUsers.types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { baseURL } from '@/api/axiosInstance'
-
-const ROLE_OPTIONS = ['All Roles', 'Admin', 'ContentManager', 'Organization', 'User'] as const
 
 const roleBadgeStyles: Record<string, string> = {
   Admin: 'bg-teal-700 text-white',
@@ -34,6 +33,7 @@ function getProfileImage(url: string | null) {
 }
 
 export default function Users() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
   const [showRoleDropdown, setShowRoleDropdown] = useState(false)
@@ -42,6 +42,8 @@ export default function Users() {
   const [createProfileImage, setCreateProfileImage] = useState<File | null>(null)
   const createFileInputRef = useRef<HTMLInputElement>(null)
   const [activeFilters, setActiveFilters] = useState<{ type: 'search' | 'role'; value: string }[]>([])
+
+  const ROLE_OPTIONS = [t('dashboard.users.all_roles'), 'Admin', 'ContentManager', 'Organization', 'User'] as const
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useAdminUsers({
     search: search || undefined,
@@ -68,7 +70,8 @@ export default function Users() {
   }
 
   const handleRoleFilter = (role: string) => {
-    const actualRole = role === 'All Roles' ? '' : role
+    const allRolesLabel = t('dashboard.users.all_roles')
+    const actualRole = role === allRolesLabel ? '' : role
     setRoleFilter(actualRole)
     setShowRoleDropdown(false)
     setActiveFilters((prev) => {
@@ -91,7 +94,7 @@ export default function Users() {
   }
 
   const handleDelete = (userId: number) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return
+    if (!confirm(t('dashboard.users.delete_confirm'))) return
     deleteMutation.mutate(userId)
   }
 
@@ -114,13 +117,13 @@ export default function Users() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-[40px] font-bold text-slate-900" style={{ fontFamily: 'Georgia, serif' }}>
-          USER MANAGEMENT
+          {t('dashboard.users.title')}
         </h2>
         <button
           onClick={() => setShowCreateModal(true)}
           className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer"
         >
-          New Content Manager
+          {t('dashboard.users.new_cm')}
         </button>
       </div>
 
@@ -130,7 +133,7 @@ export default function Users() {
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by name or keyword..."
+            placeholder={t('dashboard.users.search')}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="w-full h-12 pl-5 pr-12 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 transition-all"
@@ -141,7 +144,7 @@ export default function Users() {
             onClick={() => setShowRoleDropdown(!showRoleDropdown)}
             className="h-12 px-5 rounded-xl border border-slate-200 bg-white text-[14px] font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-2 min-w-[140px] justify-between"
           >
-            {roleFilter || 'All Roles'}
+            {roleFilter || t('dashboard.users.all_roles')}
             <svg className={`h-4 w-4 text-slate-400 transition-transform ${showRoleDropdown ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
             </svg>
@@ -153,7 +156,7 @@ export default function Users() {
                   key={role}
                   onClick={() => handleRoleFilter(role)}
                   className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 cursor-pointer transition-colors ${
-                    (roleFilter === '' && role === 'All Roles') || roleFilter === role
+                    (roleFilter === '' && role === t('dashboard.users.all_roles')) || roleFilter === role
                       ? 'bg-[#eaf4f5] text-[#0a5c66] font-medium'
                       : 'text-slate-600'
                   }`}
@@ -170,9 +173,9 @@ export default function Users() {
       {activeFilters.length > 0 && (
         <div className="flex items-center gap-3 mb-6 flex-wrap">
           <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">
-            Active Filters:
+            {t('dashboard.users.active_filters')}
           </span>
-          {activeFilters.map((f, i) => (
+          {activeFilters.map((f) => (
             <span
               key={`${f.type}-${f.value}`}
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-[12px] font-medium"
@@ -187,7 +190,7 @@ export default function Users() {
             onClick={clearFilters}
             className="text-[13px] font-medium text-[#0a5c66] underline hover:text-[#094d55] cursor-pointer"
           >
-            Clear Filters
+            {t('dashboard.users.clear_filters')}
           </button>
         </div>
       )}
@@ -205,7 +208,7 @@ export default function Users() {
         </div>
       ) : users.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100/80 text-center">
-          <p className="text-slate-500 text-[14px]">No users found.</p>
+          <p className="text-slate-500 text-[14px]">{t('dashboard.users.no_results')}</p>
         </div>
       ) : (
         <>
@@ -233,7 +236,7 @@ export default function Users() {
                   <button
                     onClick={() => handleDelete(user.userId)}
                     className="ml-4 p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
-                    title="Delete user"
+                    title={t('dashboard.users.delete_title')}
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
@@ -250,13 +253,13 @@ export default function Users() {
                 disabled={isFetchingNextPage}
                 className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('dashboard.common.loading') : t('dashboard.common.load_more')}
               </button>
             </div>
           )}
 
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {users.length} of {totalCount} users
+            {t('dashboard.users.showing', { count: users.length, total: totalCount })}
           </p>
         </>
       )}
@@ -270,50 +273,50 @@ export default function Users() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-slate-900 mb-6">New Content Manager</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-6">{t('dashboard.users.new_cm')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Full Name</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.users.form.full_name')}</label>
                 <input
                   type="text"
                   value={createForm.fullName}
                   onChange={(e) => setCreateForm((p) => ({ ...p, fullName: e.target.value }))}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20"
-                  placeholder="Enter full name"
+                  placeholder={t('dashboard.users.form.full_name_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Email</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.users.form.email')}</label>
                 <input
                   type="email"
                   value={createForm.email}
                   onChange={(e) => setCreateForm((p) => ({ ...p, email: e.target.value }))}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20"
-                  placeholder="Enter email address"
+                  placeholder={t('dashboard.users.form.email_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Password</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.users.form.password')}</label>
                 <input
                   type="password"
                   value={createForm.password}
                   onChange={(e) => setCreateForm((p) => ({ ...p, password: e.target.value }))}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20"
-                  placeholder="Min 6 characters"
+                  placeholder={t('dashboard.users.form.password_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Phone Number (optional)</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.users.form.phone')}</label>
                 <input
                   type="tel"
                   value={createForm.phoneNumber}
                   onChange={(e) => setCreateForm((p) => ({ ...p, phoneNumber: e.target.value }))}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20"
-                  placeholder="Enter phone number"
+                  placeholder={t('dashboard.users.form.phone_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Profile Image (optional)</label>
+                <label className="block text-[13px] font-medium text-slate-600 mb-1.5">{t('dashboard.users.form.profile_image')}</label>
                 <input
                   ref={createFileInputRef}
                   type="file"
@@ -327,7 +330,7 @@ export default function Users() {
                   className="w-full h-10 px-3 rounded-lg border border-dashed border-slate-300 text-[13px] text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  {createProfileImage ? createProfileImage.name : 'Choose image...'}
+                  {createProfileImage ? createProfileImage.name : t('dashboard.users.form.choose_image')}
                 </button>
               </div>
             </div>
@@ -340,14 +343,14 @@ export default function Users() {
                 }}
                 className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                Cancel
+                {t('dashboard.common.cancel')}
               </button>
               <button
                 onClick={handleCreate}
                 disabled={!createForm.fullName || !createForm.email || !createForm.password || createMutation.isPending}
                 className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {createMutation.isPending ? 'Creating...' : 'Create'}
+                {createMutation.isPending ? t('dashboard.users.form.creating') : t('dashboard.common.create')}
               </button>
             </div>
           </div>
