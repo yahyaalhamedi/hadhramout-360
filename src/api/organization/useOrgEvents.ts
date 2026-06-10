@@ -127,6 +127,15 @@ async function deleteOrgEventMedia(mediaId: number): Promise<{ success: boolean 
   return data
 }
 
+async function replaceOrgEventMedia(mediaId: number, file: File): Promise<{ mediaId: number; mediaUrl: string }> {
+  const formData = new FormData()
+  formData.append('File', file)
+  const { data } = await axiosInstance.put(`/api/events/media/${mediaId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
 // ── Hooks ─────────────────────────────────────────────────────────
 
 export function useOrgEvents({ search, fromDate, toDate, upcomingOnly, pageSize }: UseOrgEventsParams) {
@@ -153,7 +162,7 @@ export function useCreateOrgEventWithMedia() {
   return useMutation({
     mutationFn: createOrgEventWithMedia,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },
   })
 }
@@ -163,7 +172,7 @@ export function useCreateOrgEvent() {
   return useMutation({
     mutationFn: createOrgEvent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },
   })
 }
@@ -173,7 +182,7 @@ export function useUpdateOrgEvent() {
   return useMutation({
     mutationFn: updateOrgEvent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },
   })
 }
@@ -183,7 +192,7 @@ export function useDeleteOrgEvent() {
   return useMutation({
     mutationFn: deleteOrgEvent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },
   })
 }
@@ -193,7 +202,7 @@ export function useAddOrgEventMedia() {
   return useMutation({
     mutationFn: ({ id, file }: { id: number; file: File }) => addOrgEventMedia(id, file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
     },
   })
 }
@@ -203,7 +212,20 @@ export function useDeleteOrgEventMedia() {
   return useMutation({
     mutationFn: deleteOrgEventMedia,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org-events'] })
+      return queryClient.invalidateQueries({ queryKey: ['org-events'] })
+    },
+  })
+}
+
+export function useReplaceOrgEventMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ mediaId, file }: { mediaId: number; file: File }) => replaceOrgEventMedia(mediaId, file),
+    onSuccess: () => {
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['org-events'] }),
+        queryClient.invalidateQueries({ queryKey: ['org-event'] })
+      ])
     },
   })
 }

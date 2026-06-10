@@ -10,6 +10,7 @@ import {
   useOrgEvent,
   useAddOrgEventMedia,
   useDeleteOrgEventMedia,
+  useReplaceOrgEventMedia,
 } from '@/api/organization/useOrgEvents'
 import type { EventResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
@@ -52,6 +53,7 @@ export default function OrgEvents() {
   const deleteMutation = useDeleteOrgEvent()
   const addMediaMutation = useAddOrgEventMedia()
   const deleteMediaMutation = useDeleteOrgEventMedia()
+  const replaceMediaMutation = useReplaceOrgEventMedia()
 
   const events = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
@@ -79,11 +81,11 @@ export default function OrgEvents() {
       addressEn: ev.addressEn ?? '',
       mapUrl: '',
       formUrl: '',
-      startDate: ev.startDate ? new Date(ev.startDate).toISOString().slice(0, 10) : '',
-      endDate: ev.endDate ? new Date(ev.endDate).toISOString().slice(0, 10) : '',
+      startDate: ev.startDate ? ev.startDate.split('T')[0] : '',
+      endDate: ev.endDate ? ev.endDate.split('T')[0] : '',
     })
     setCoverFile(null)
-    setCoverPreview(null)
+    setCoverPreview(ev.coverImageUrl ? getImageUrl(ev.coverImageUrl) : null)
     setMediaFiles([])
     setShowModal(true)
   }
@@ -100,33 +102,38 @@ export default function OrgEvents() {
     }))
   }
 
-  const handleSubmit = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async () => {
     if (!form.titleAr || !form.titleEn || !form.descriptionAr || !form.descriptionEn || !form.addressAr || !form.addressEn || !form.startDate || !form.endDate) return
 
-    if (editingId) {
-      updateMutation.mutate(
-        { id: editingId, ...form },
-        {
-          onSuccess: () => {
-            setShowModal(false)
-            setEditingId(null)
-            setForm(emptyEventForm)
-          },
-        },
-      )
-    } else {
-      createMutation.mutate(
-        { ...form, files: mediaFiles, coverImage: coverFile ?? undefined },
-        {
-          onSuccess: () => {
-            setShowModal(false)
-            setForm(emptyEventForm)
-            setCoverFile(null)
-            setCoverPreview(null)
-            setMediaFiles([])
-          },
-        },
-      )
+    setIsSubmitting(true)
+
+    try {
+      if (editingId) {
+        await updateMutation.mutateAsync({ id: editingId, ...form })
+        
+        if (coverFile) {
+          const existingCoverId = editingEvent?.media?.[0]?.mediaId
+          if (existingCoverId) {
+            // Replace existing thumbnail (media[0])
+            await replaceMediaMutation.mutateAsync({ mediaId: existingCoverId, file: coverFile })
+          } else {
+            // No existing media — add as new (becomes media[0])
+            await addMediaMutation.mutateAsync({ id: editingId, file: coverFile })
+          }
+        }
+      } else {
+        await createMutation.mutateAsync({ ...form, files: mediaFiles, coverImage: coverFile ?? undefined })
+      }
+    } finally {
+      setIsSubmitting(false)
+      setShowModal(false)
+      setEditingId(null)
+      setForm(emptyEventForm)
+      setCoverFile(null)
+      setCoverPreview(null)
+      setMediaFiles([])
     }
   }
 
@@ -328,7 +335,7 @@ export default function OrgEvents() {
           form={form}
           setForm={setForm}
           editingId={editingId}
-          isPending={createMutation.isPending || updateMutation.isPending}
+          isPending={isSubmitting}
           isFetchingDetail={isFetchingEvent}
           onSubmit={handleSubmit}
           onClose={handleClose}
