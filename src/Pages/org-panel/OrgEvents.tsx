@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Plus, Pencil, Trash2, Calendar, MapPin } from 'lucide-react'
 import {
   useOrgEvents,
@@ -29,6 +30,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function OrgEvents() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'active' | 'ended'>('active')
   const [showModal, setShowModal] = useState(false)
@@ -43,7 +45,7 @@ export default function OrgEvents() {
     upcomingOnly: activeTab === 'active' ? true : undefined,
   })
 
-  const { data: editingEvent } = useOrgEvent(editingId ?? undefined)
+  const { data: editingEvent, isFetching: isFetchingEvent } = useOrgEvent(editingId ?? undefined)
 
   const createMutation = useCreateOrgEventWithMedia()
   const updateMutation = useUpdateOrgEvent()
@@ -113,9 +115,8 @@ export default function OrgEvents() {
         },
       )
     } else {
-      const files = coverFile ? [coverFile, ...mediaFiles] : mediaFiles
       createMutation.mutate(
-        { ...form, files },
+        { ...form, files: mediaFiles, coverImage: coverFile ?? undefined },
         {
           onSuccess: () => {
             setShowModal(false)
@@ -130,7 +131,7 @@ export default function OrgEvents() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm('Are you sure you want to delete this event?')) return
+    if (!confirm(t('org_panel.events.delete_confirm'))) return
     deleteMutation.mutate(id)
   }
 
@@ -170,14 +171,14 @@ export default function OrgEvents() {
           className="text-[40px] font-bold text-slate-900"
           style={{ fontFamily: 'Georgia, serif' }}
         >
-          EVENTS
+          {t('org_panel.events.title')}
         </h2>
         <button
           onClick={openCreate}
           className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          Create event
+          {t('org_panel.events.create')}
         </button>
       </div>
 
@@ -191,7 +192,7 @@ export default function OrgEvents() {
               : 'bg-[#eaf4f5] text-[#0a5c66]'
           }`}
         >
-          Active Events
+          {t('org_panel.events.tab_active')}
           <span className="bg-[#0a5c66] text-white text-[13px] font-medium px-3 py-1 rounded-full">
             {activeTab === 'active' ? totalCount : '—'}
           </span>
@@ -204,7 +205,7 @@ export default function OrgEvents() {
               : 'bg-[#eaf4f5] text-[#0a5c66]'
           }`}
         >
-          Ends Events
+          {t('org_panel.events.tab_ended')}
           <span className={`text-[13px] font-medium px-3 py-1 rounded-full ${
             activeTab === 'ended'
               ? 'bg-white/20 text-white'
@@ -224,7 +225,7 @@ export default function OrgEvents() {
         </div>
       ) : events.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 shadow-sm border border-slate-100/80 text-center">
-          <p className="text-slate-500 text-[14px]">No events found.</p>
+          <p className="text-slate-500 text-[14px]">{t('org_panel.events.no_results')}</p>
         </div>
       ) : (
         <>
@@ -265,18 +266,18 @@ export default function OrgEvents() {
                       )}
                     </div>
                     <span className="text-sm text-white">
-                      {ev.organizationNameEn || ev.organizationNameAr || 'Organization'}
+                      {ev.organizationNameEn || ev.organizationNameAr || t('org_panel.events.organization')}
                     </span>
                   </div>
 
                   <h2 className="mb-5 text-4xl font-bold leading-tight text-white">
-                    {ev.titleEn || ev.titleAr || 'Untitled Event'}
+                    {ev.titleEn || ev.titleAr || t('org_panel.events.untitled')}
                   </h2>
 
                   <div className="mb-4 flex items-center gap-6 text-sm text-white/90">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      <span>{ev.addressEn || ev.addressAr || 'Location'}</span>
+                      <span>{ev.addressEn || ev.addressAr || t('org_panel.events.location')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
@@ -288,14 +289,14 @@ export default function OrgEvents() {
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(ev) }}
                       className="p-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
-                      title="Edit"
+                      title={t('org_panel.events.edit')}
                     >
                       <Pencil className="h-5 w-5" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(ev.eventId) }}
                       className="p-3 rounded-xl bg-white/10 text-white hover:bg-red-500/80 transition-colors cursor-pointer"
-                      title="Delete"
+                      title={t('org_panel.events.delete')}
                     >
                       <Trash2 className="h-5 w-5" />
                     </button>
@@ -312,12 +313,12 @@ export default function OrgEvents() {
                 disabled={isFetchingNextPage}
                 className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? t('org_panel.events.loading') : t('org_panel.events.load_more')}
               </button>
             </div>
           )}
           <p className="text-center text-[12px] text-slate-400 mt-4">
-            Showing {events.length} of {totalCount} events
+            {t('org_panel.events.showing', { count: events.length, total: totalCount })}
           </p>
         </>
       )}
@@ -328,6 +329,7 @@ export default function OrgEvents() {
           setForm={setForm}
           editingId={editingId}
           isPending={createMutation.isPending || updateMutation.isPending}
+          isFetchingDetail={isFetchingEvent}
           onSubmit={handleSubmit}
           onClose={handleClose}
           coverFile={coverFile}

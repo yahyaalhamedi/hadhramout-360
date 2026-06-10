@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { MapPin, LinkIcon, Mail, Phone, Upload, Pencil } from 'lucide-react'
 import { useOrgProfile, useUpdateOrgProfile } from '@/api/organization/useOrganization'
 import { baseURL } from '@/api/axiosInstance'
@@ -9,6 +10,7 @@ function getImageUrl(url: string | null) {
 }
 
 export default function OrgProfile() {
+  const { t } = useTranslation()
   const { data: profile, isLoading } = useOrgProfile()
   const updateMutation = useUpdateOrgProfile()
   const [isEditing, setIsEditing] = useState(false)
@@ -109,7 +111,7 @@ export default function OrgProfile() {
             className="text-[40px] font-bold text-slate-900"
             style={{ fontFamily: 'Georgia, serif' }}
           >
-            Organization Profile
+            {t('org_panel.profile.title')}
           </h2>
         </div>
 
@@ -117,7 +119,7 @@ export default function OrgProfile() {
           {/* Logo Upload */}
           <div className="mb-8">
             <label className="block text-[13px] font-semibold text-[#0a5c66] mb-3">
-              Organization Logo
+              {t('org_panel.profile.logo')}
             </label>
             <input
               ref={logoInputRef}
@@ -139,9 +141,9 @@ export default function OrgProfile() {
                 <>
                   <Upload className="h-8 w-8" />
                   <span className="text-[13px]">
-                    Upload a file or drag and drop
+                    {t('org_panel.profile.upload_hint')}
                   </span>
-                  <span className="text-[11px] text-slate-400">PNG, JPG, SVG up to 5MB</span>
+                  <span className="text-[11px] text-slate-400">{t('org_panel.profile.upload_desc')}</span>
                 </>
               )}
             </button>
@@ -152,7 +154,7 @@ export default function OrgProfile() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Organization Name (English)
+                  {t('org_panel.profile.name_en')}
                 </label>
                 <input
                   value={form.orgNameEn}
@@ -163,7 +165,7 @@ export default function OrgProfile() {
               </div>
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Organization Name (Arabic)
+                  {t('org_panel.profile.name_ar')}
                 </label>
                 <input
                   value={form.orgNameAr}
@@ -179,25 +181,25 @@ export default function OrgProfile() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Description (English)
+                  {t('org_panel.profile.desc_en')}
                 </label>
                 <textarea
                   value={form.descriptionEn}
                   onChange={(e) => setForm((p) => ({ ...p, descriptionEn: e.target.value }))}
                   rows={3}
-                  placeholder="Briefly describe your organization's mission..."
+                  placeholder={t('org_panel.profile.desc_en_placeholder')}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none bg-[#f8f9fa]"
                 />
               </div>
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Description (Arabic)
+                  {t('org_panel.profile.desc_ar')}
                 </label>
                 <textarea
                   value={form.descriptionAr}
                   onChange={(e) => setForm((p) => ({ ...p, descriptionAr: e.target.value }))}
                   rows={3}
-                  placeholder="صف باختصار رسالة مؤسستك..."
+                  placeholder={t('org_panel.profile.desc_ar_placeholder')}
                   dir="rtl"
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-[14px] outline-none focus:border-[#0a5c66] focus:ring-2 focus:ring-[#0a5c66]/20 resize-none bg-[#f8f9fa]"
                 />
@@ -208,7 +210,7 @@ export default function OrgProfile() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Address (English)
+                  {t('org_panel.profile.address_en')}
                 </label>
                 <input
                   value={form.addressEn}
@@ -219,7 +221,7 @@ export default function OrgProfile() {
               </div>
               <div>
                 <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                  Address (Arabic)
+                  {t('org_panel.profile.address_ar')}
                 </label>
                 <input
                   value={form.addressAr}
@@ -234,7 +236,7 @@ export default function OrgProfile() {
             {/* Map URL */}
             <div>
               <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                Google Maps URL
+                {t('org_panel.profile.map_url')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -250,7 +252,7 @@ export default function OrgProfile() {
             {/* Email */}
             <div>
               <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                EMAIL ADDRESS
+                {t('org_panel.profile.email')}
               </label>
               <input
                 value={form.email}
@@ -264,7 +266,7 @@ export default function OrgProfile() {
             {/* Phone */}
             <div>
               <label className="block text-[13px] font-semibold text-[#0a5c66] mb-1.5">
-                PHONE NUMBER
+                {t('org_panel.profile.phone')}
               </label>
               <input
                 value={form.phoneNumber}
@@ -283,7 +285,7 @@ export default function OrgProfile() {
               disabled={updateMutation.isPending}
               className="w-full h-12 rounded-xl bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {updateMutation.isPending ? 'Saving...' : 'SAVE CHANGES'}
+              {updateMutation.isPending ? t('org_panel.profile.saving') : t('org_panel.profile.save')}
             </button>
             <button
               onClick={() => {
@@ -293,7 +295,7 @@ export default function OrgProfile() {
               }}
               className="w-full h-12 rounded-xl border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              {t('org_panel.profile.cancel')}
             </button>
           </div>
         </div>
@@ -308,14 +310,14 @@ export default function OrgProfile() {
           className="text-[40px] font-bold text-slate-900"
           style={{ fontFamily: 'Georgia, serif' }}
         >
-          MY PROFILE
+          {t('org_panel.profile.title')}
         </h2>
         <button
           onClick={openEdit}
           className="bg-[#0a5c66] text-white px-6 py-3 rounded-xl text-[14px] font-medium hover:bg-[#094d55] transition-colors cursor-pointer flex items-center gap-2"
         >
           <Pencil className="h-4 w-4" />
-          Edit Profile
+          {t('org_panel.profile.edit')}
         </button>
       </div>
 
@@ -331,7 +333,7 @@ export default function OrgProfile() {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                No logo
+                {t('org_panel.profile.no_logo')}
               </div>
             )}
           </div>

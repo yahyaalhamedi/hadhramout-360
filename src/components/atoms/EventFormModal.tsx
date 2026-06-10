@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Calendar, MapPin, Upload, CloudUpload, X, ImageIcon, Trash2 } from 'lucide-react'
+import { Calendar, MapPin, Upload, CloudUpload, X, ImageIcon, Trash2, Loader2 } from 'lucide-react'
 import RichTextEditor from './RichTextEditor'
 import type { EventMediaResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
@@ -48,6 +48,7 @@ interface EventFormModalProps {
   onDeleteMedia?: (mediaId: number) => void
   isAddingMedia?: boolean
   isDeletingMedia?: boolean
+  isFetchingDetail?: boolean
 }
 
 function getMediaUrl(url: string | null) {
@@ -71,6 +72,7 @@ export default function EventFormModal({
   onDeleteMedia,
   isAddingMedia,
   isDeletingMedia,
+  isFetchingDetail,
 }: EventFormModalProps) {
   const { t } = useTranslation()
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -117,6 +119,13 @@ export default function EventFormModal({
           </button>
         </div>
 
+        {editingId && isFetchingDetail ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-[#0a5c66]" />
+            <p className="text-[14px] text-slate-500">Loading event data...</p>
+          </div>
+        ) : (
+        <>
         {/* Thumbnail */}
         <div className="mb-6">
           <input
@@ -138,6 +147,7 @@ export default function EventFormModal({
                 <CloudUpload className="h-10 w-10 text-slate-400" />
                 <span className="text-[14px] font-medium">{t('dashboard.event_form.upload_image')}</span>
                 <span className="text-[12px] text-slate-400">{t('dashboard.event_form.image_hint')}</span>
+                <span className="text-[11px] text-[#0a5c66] max-w-[80%] text-center mt-1">{t('dashboard.event_form.cover_hint2')}</span>
               </>
             )}
           </button>
@@ -307,15 +317,18 @@ export default function EventFormModal({
           </div>
 
           {/* Media Gallery */}
-          <div className="flex items-center gap-2 mt-6 mb-2">
-            <ImageIcon className="h-4 w-4 text-[#0a5c66]" />
-            <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.media_gallery')}</span>
-            {editingId && existingMedia && existingMedia.length > 0 && (
-              <span className="text-[12px] text-slate-400">({existingMedia.length})</span>
-            )}
-            {!editingId && mediaFiles && mediaFiles.length > 0 && (
-              <span className="text-[12px] text-slate-400">({mediaFiles.length})</span>
-            )}
+          <div className="flex flex-col mt-6 mb-2">
+            <div className="flex items-center gap-2 mb-1">
+              <ImageIcon className="h-4 w-4 text-[#0a5c66]" />
+              <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.media_gallery')}</span>
+              {editingId && existingMedia && existingMedia.length > 0 && (
+                <span className="text-[12px] text-slate-400">({existingMedia.length})</span>
+              )}
+              {!editingId && mediaFiles && mediaFiles.length > 0 && (
+                <span className="text-[12px] text-slate-400">({mediaFiles.length})</span>
+              )}
+            </div>
+            <span className="text-[11px] text-slate-500">{t('dashboard.event_form.media_hint')}</span>
           </div>
 
           <input
@@ -383,6 +396,8 @@ export default function EventFormModal({
             {isAddingMedia ? t('dashboard.event_form.uploading') : t('dashboard.event_form.add_media')}
           </button>
         </div>
+        </>
+        )}
 
         {/* Actions */}
         <div className="mt-8 space-y-3">

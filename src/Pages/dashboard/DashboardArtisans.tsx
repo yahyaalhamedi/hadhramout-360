@@ -1,8 +1,9 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Trash2, Plus, Pencil, Upload } from 'lucide-react'
+import { Search, Trash2, Plus, Pencil, Upload, Loader2 } from 'lucide-react'
 import {
   useArtisans,
+  useArtisan,
   useCreateArtisanWithMedia,
   useUpdateArtisan,
   useDeleteArtisan,
@@ -40,6 +41,8 @@ export default function DashboardArtisans() {
     pageSize: 10,
   })
 
+  const { data: editingDetail, isFetching: isFetchingDetail } = useArtisan(editingId ?? undefined)
+
   const createMutation = useCreateArtisanWithMedia()
   const updateMutation = useUpdateArtisan()
   const deleteMutation = useDeleteArtisan()
@@ -49,6 +52,21 @@ export default function DashboardArtisans() {
   }, [data])
 
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
+
+  useEffect(() => {
+    if (editingId && editingDetail && !form.descriptionAr && editingDetail.descriptionAr) {
+      setForm({
+        nameAr: editingDetail.nameAr ?? '',
+        nameEn: editingDetail.nameEn ?? '',
+        phone: editingDetail.phone ?? '',
+        descriptionAr: editingDetail.descriptionAr ?? '',
+        descriptionEn: editingDetail.descriptionEn ?? '',
+        locationTextAr: editingDetail.locationTextAr ?? '',
+        locationTextEn: editingDetail.locationTextEn ?? '',
+        mapUrl: editingDetail.mapUrl ?? '',
+      })
+    }
+  }, [editingId, editingDetail, form.descriptionAr])
 
   const openCreate = () => {
     setEditingId(null)
@@ -195,6 +213,12 @@ export default function DashboardArtisans() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-slate-900 mb-6">{editingId ? t('dashboard.artisans.edit') : t('dashboard.artisans.create')}</h3>
+            {editingId && isFetchingDetail ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-[#0a5c66]" />
+                <p className="text-[14px] text-slate-500">Loading artisan data...</p>
+              </div>
+            ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -245,6 +269,7 @@ export default function DashboardArtisans() {
                 </div>
               )}
             </div>
+            )}
             <div className="flex gap-3 mt-6">
               <button onClick={() => { setShowModal(false); setEditingId(null); setForm(emptyForm); setFiles([]) }} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">{t('dashboard.common.cancel')}</button>
               <button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="flex-1 h-10 rounded-lg bg-[#0a5c66] text-white text-[14px] font-medium hover:bg-[#094d55] transition-colors disabled:opacity-50 cursor-pointer">

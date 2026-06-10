@@ -99,6 +99,7 @@ export interface CreateEventWithMediaParams {
   formUrl?: string
   startDate: string
   endDate: string
+  coverImage?: File | null
   files?: File[]
 }
 

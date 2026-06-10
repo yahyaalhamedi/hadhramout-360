@@ -42,9 +42,10 @@ interface DetailHeroProps {
   children: React.ReactNode
   /** Extra elements rendered top-right (e.g. favourite button) */
   topRight?: React.ReactNode
+  contentClassName?: string
 }
 
-export const DetailHero = ({ imageUrl, imageAlt, children, topRight }: DetailHeroProps) => (
+export const DetailHero = ({ imageUrl, imageAlt, children, topRight, contentClassName }: DetailHeroProps) => (
   <div className="relative h-[55vh] min-h-[400px] w-full overflow-hidden">
     <img
       src={imageUrl}
@@ -56,8 +57,8 @@ export const DetailHero = ({ imageUrl, imageAlt, children, topRight }: DetailHer
     <BackButton />
     {topRight && <div className="absolute end-6 top-6 z-10">{topRight}</div>}
 
-    {/* Bottom-start content */}
-    <div className="absolute bottom-0 start-0 px-6 pb-8 md:px-12">{children}</div>
+    {/* Bottom content */}
+    <div className={`absolute bottom-0 w-full px-6 pb-8 md:px-12 ${contentClassName || 'start-0'}`}>{children}</div>
   </div>
 )
 

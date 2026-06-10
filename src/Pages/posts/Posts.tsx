@@ -64,7 +64,7 @@ const Posts = () => {
             <PostCard
               key={post.postId}
               postId={post.postId}
-              userName={post.user.userName || 'Unknown'}
+              userName={post.user.fullName || 'Unknown'}
               userAvatar={post.user.profileImageUrl}
               contentText={post.contentText}
               createdAt={post.createdAt}

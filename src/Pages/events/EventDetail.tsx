@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { Calendar, MapPin } from 'lucide-react'
+import { Calendar, MapPin, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useGetRtl } from '@/lib/utils'
 import { useEvent } from '@/api/events/useEvents'
@@ -56,7 +56,8 @@ const EventDetail = () => {
     ? `${baseURL}${event.media[0].mediaUrl}`
     : FALLBACK_IMAGE
 
-  const galleryImages = (event.media ?? []).map((m) => ({
+  // media[0] is the thumbnail/hero image, the rest are gallery media
+  const galleryImages = (event.media ?? []).slice(1).map((m) => ({
     url: m.mediaUrl ? `${baseURL}${m.mediaUrl}` : FALLBACK_IMAGE,
     alt: title ?? '',
   }))
@@ -76,23 +77,45 @@ const EventDetail = () => {
       <DetailHero
         imageUrl={coverUrl}
         imageAlt={title || ''}
+        contentClassName="inset-x-0 pb-12"
       >
-        {/* Title */}
-        <h1 className="max-w-2xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
-          {title}
-        </h1>
+        <div className="flex w-full flex-col md:flex-row md:items-end justify-between gap-6">
+          {/* Left side: Title and Meta */}
+          <div className="flex flex-col items-start gap-4">
+            <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl lg:text-6xl drop-shadow-lg text-left">
+              {title}
+            </h1>
 
-        {/* Meta row */}
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
-          <span className="flex items-center gap-1.5">
-            <Calendar className="h-4 w-4" />
-            {dateRange}
-          </span>
-          {address && (
-            <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              {address}
-            </span>
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90 drop-shadow-md">
+              <span className="flex items-center gap-1.5 bg-black/30 px-4 py-2 rounded-full backdrop-blur-md">
+                <Calendar className="h-4 w-4" />
+                {dateRange}
+              </span>
+              {address && (
+                <span className="flex items-center gap-1.5 bg-black/30 px-4 py-2 rounded-full backdrop-blur-md">
+                  <MapPin className="h-4 w-4" />
+                  {address}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Registration Button */}
+          {event.formUrl && (
+            <div className="shrink-0 mb-1">
+              <a
+                href={event.formUrl.startsWith('http') ? event.formUrl : `https://${event.formUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#0a5c66] via-[#0d7a88] to-[#0a5c66] bg-[length:200%_auto] px-8 py-4 text-[15px] font-bold text-white shadow-[0_0_20px_rgba(10,92,102,0.4)] transition-all duration-500 hover:scale-105 hover:bg-[position:right_center] hover:shadow-[0_0_30px_rgba(10,92,102,0.6)] focus:outline-none focus:ring-2 focus:ring-[#0a5c66]/50"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {t('label.register_now')}
+                  <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </a>
+            </div>
           )}
         </div>
       </DetailHero>
@@ -151,6 +174,8 @@ const EventDetail = () => {
                 value={dateRange}
               />
             </div>
+
+
 
             {/* Map card */}
             {event.mapUrl && (

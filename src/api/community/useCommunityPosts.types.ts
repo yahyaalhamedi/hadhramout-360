@@ -15,7 +15,7 @@ export interface PaginationMeta {
 
 export interface CommunityPostUserDto {
   userId: number
-  userName: string | null
+  fullName: string | null
   profileImageUrl: string | null
 }
 

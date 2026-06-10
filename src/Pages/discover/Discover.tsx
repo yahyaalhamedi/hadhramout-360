@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Search, Landmark, UtensilsCrossed, Gamepad2, Globe, type LucideIcon } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Search, UtensilsCrossed, Globe, type LucideIcon } from 'lucide-react'
 import InfiniteScroll from 'react-infinite-scroller'
 import { Input } from '@/components/ui/input'
 import DiscoverCard from '@/components/atoms/DiscoverCard'
@@ -12,18 +12,105 @@ import { cn } from '@/lib/utils'
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
 
+// ── Custom Throne of Bilqis Icon (Commented out for later use) ─────
+// const ThroneIcon = (props: React.ComponentProps<'svg'>) => (
+//   <svg
+//     viewBox="0 0 24 24"
+//     width="24"
+//     height="24"
+//     fill="none"
+//     stroke="currentColor"
+//     strokeWidth="2"
+//     strokeLinecap="round"
+//     strokeLinejoin="round"
+//     {...props}
+//   >
+//     {/* Base Platform */}
+//     <rect x="1" y="16" width="22" height="6" rx="1" />
+//     <path d="M8 16v6" />
+//     <path d="M16 16v6" />
+//     <path d="M8 18h8" />
+//     <path d="M8 20h8" />
+//
+//     {/* Pillars */}
+//     <path d="M2 16V10" />
+//     <path d="M6 16V4" />
+//     <path d="M10 16V4" />
+//     <path d="M14 16V4" />
+//     <path d="M18 16V4" />
+//     <path d="M22 16V4" />
+//   </svg>
+// )
+
+// ── Custom Yemeni Castle Icon (Dar Al-Hajar) ───────────────────────
+const CastleIcon = (props: React.ComponentProps<'svg'>) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    {/* Rock and Castle Outline */}
+    <path d="M2 22l2-3 1 1 1-4V8l1-3 1 3h3l1-3 1 3h3l1-3 1 3v8l2 3-1 1 3 2z" />
+    {/* Decorative Belt */}
+    <path d="M6 12h12" />
+    {/* Windows */}
+    <path d="M9 9.5v.01" />
+    <path d="M15 9.5v.01" />
+    <path d="M12 14.5v.01" />
+  </svg>
+)
+
+// ── Custom Dominoes Icon ───────────────────────────────────────────
+const DominoIcon = (props: React.ComponentProps<'svg'>) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    {/* Vertical Domino (Left) */}
+    <rect x="2" y="3" width="8" height="16" rx="2" />
+    <line x1="2" y1="11" x2="10" y2="11" />
+    <path d="M4.5 5.5h.01" />
+    <path d="M7.5 5.5h.01" />
+    <path d="M4.5 8.5h.01" />
+    <path d="M7.5 8.5h.01" />
+    <path d="M6 15h.01" />
+
+    {/* Horizontal Domino (Right) */}
+    <rect x="11" y="8" width="11" height="8" rx="2" />
+    <line x1="16.5" y1="8" x2="16.5" y2="16" />
+    <path d="M12.25 10.5h.01" />
+    <path d="M15.25 13.5h.01" />
+    <path d="M17.75 10.5h.01" />
+    <path d="M19.25 12h.01" />
+    <path d="M20.75 13.5h.01" />
+  </svg>
+)
+
 // ── Fixed categories matching API endpoints ────────────────────────
 interface Tab {
   key: string
-  icon: LucideIcon
+  icon: LucideIcon | React.ComponentType<any>
   labelAr: string
   labelEn: string
 }
 
 const CATEGORY_TABS: Tab[] = [
-  { key: 'culture', icon: Landmark, labelAr: 'ثقافة', labelEn: 'Culture' },
-  { key: 'food', icon: UtensilsCrossed, labelAr: 'طعام', labelEn: 'Food' },
-  { key: 'games', icon: Gamepad2, labelAr: 'ألعاب', labelEn: 'Games' },
+  { key: 'culture', icon: CastleIcon, labelAr: 'الأماكن الشعبية', labelEn: 'Traditional Places' },
+  { key: 'food', icon: UtensilsCrossed, labelAr: 'الأكلات الشعبية', labelEn: 'Traditional Food' },
+  { key: 'games', icon: DominoIcon, labelAr: 'الألعاب الشعبية', labelEn: 'Traditional Games' },
 ]
 
 const Discover = () => {

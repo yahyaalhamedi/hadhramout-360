@@ -3,15 +3,15 @@ import {
   MapPin,
   Phone,
   MessageSquare,
-  Heart,
   Share2,
   ArrowLeft,
   ArrowRight,
 } from 'lucide-react'
-import { useGetRtl } from '@/lib/utils'
+import { useGetRtl, parseIdFromSlug, getArtisanSlug } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useArtisan, useArtisans } from '@/api/artisans/useArtisans'
 import { baseURL } from '@/api/axiosInstance'
+import { toast } from 'sonner'
 import { DetailGallery, DetailNotFound } from '@/components/atoms/DetailComponents'
 import {
   Carousel,
@@ -30,7 +30,7 @@ const ArtisanDetail = () => {
   const { t } = useTranslation()
   const isRtl = useGetRtl()
 
-  const id = slug ? Number(slug) : undefined
+  const id = parseIdFromSlug(slug)
   const { data: artisan, isLoading, isError } = useArtisan(id)
 
   const { data: otherArtisansData } = useArtisans({ pageSize: 4 })
@@ -61,6 +61,33 @@ const ArtisanDetail = () => {
   const name = isRtl ? artisan.nameAr : artisan.nameEn
   const description = isRtl ? artisan.descriptionAr : artisan.descriptionEn
   const location = isRtl ? artisan.locationTextAr : artisan.locationTextEn
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href
+    const shareTitle = name || t('artisans')
+    const shareText = description || ''
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        })
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Error sharing:', err)
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl)
+        toast.success(t('share.success', 'Link copied to clipboard!'))
+      } catch (err) {
+        console.error('Failed to copy link:', err)
+      }
+    }
+  }
 
   const coverUrl = artisan.media?.find((m) => m.isCover)?.mediaUrl
     ? `${baseURL}${artisan.media.find((m) => m.isCover)!.mediaUrl}`
@@ -129,10 +156,10 @@ const ArtisanDetail = () => {
 
         {/* Bottom-right actions */}
         <div className="absolute bottom-8 end-6 z-10 flex items-center gap-3">
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/25">
-            <Heart className="h-5 w-5" />
-          </button>
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/25">
+          <button
+            onClick={handleShare}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/25"
+          >
             <Share2 className="h-5 w-5" />
           </button>
         </div>
@@ -302,7 +329,7 @@ const ArtisanDetail = () => {
                     className="cursor-pointer"
                     onClick={() => {
                       if (!isPlaceholder) {
-                        navigate(`/artisans/${a.artisanId}`, {
+                        navigate(`/artisans/${getArtisanSlug(a.artisanId, a.nameAr, a.nameEn)}`, {
                           state: { from: '/artisans', label: t('artisans') },
                         })
                         window.scrollTo(0, 0)

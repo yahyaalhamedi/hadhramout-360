@@ -116,13 +116,7 @@ const Community = () => {
 
               {/* View All Posts Button */}
               <button
-                onClick={() => {
-                  if (!isLoggedIn) {
-                    navigate('/auth')
-                  } else {
-                    feedRef.current?.scrollIntoView({ behavior: 'smooth' })
-                  }
-                }}
+                onClick={() => navigate('/posts')}
                 className="w-full rounded-full bg-primary-7 py-4 text-sm font-bold text-white hover:bg-primary-8 transition-colors cursor-pointer"
               >
                 {t('community.view_all_posts')}
@@ -159,7 +153,7 @@ const Community = () => {
                   <PostCard
                     key={post.postId}
                     postId={post.postId}
-                    userName={post.user.userName || 'Unknown'}
+                    userName={post.user.fullName || 'Unknown'}
                     userAvatar={post.user.profileImageUrl}
                     contentText={post.contentText}
                     createdAt={post.createdAt}

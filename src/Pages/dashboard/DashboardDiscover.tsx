@@ -42,10 +42,10 @@ export default function DashboardDiscover() {
   const updateMutation = useUpdateDiscoverContent()
   const deleteMutation = useDeleteDiscoverContent()
 
-  const { data: editingDetail } = useDiscoverContentById(editingId ?? undefined)
+  const { data: editingDetail, isFetching: isFetchingDetail } = useDiscoverContentById(editingId ?? undefined)
 
   useEffect(() => {
-    if (editingId && editingDetail && !form.bodyAr && editingDetail.bodyAr) {
+    if (editingId && editingDetail && !form.titleAr) {
       setForm({
         titleAr: editingDetail.titleAr ?? '',
         titleEn: editingDetail.titleEn ?? '',
@@ -53,7 +53,7 @@ export default function DashboardDiscover() {
         bodyEn: editingDetail.bodyEn ?? '',
       })
     }
-  }, [editingId, editingDetail, form.bodyAr])
+  }, [editingId, editingDetail, form.titleAr])
 
   const items = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
@@ -203,6 +203,12 @@ export default function DashboardDiscover() {
                 <X className="h-5 w-5" />
               </button>
             </div>
+            {editingId && isFetchingDetail ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-[#0a5c66]" />
+                <p className="text-[14px] text-slate-500">Loading discover data...</p>
+              </div>
+            ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -252,6 +258,7 @@ export default function DashboardDiscover() {
                 )}
               </div>
             </div>
+            )}
             <div className="flex gap-3 mt-6">
               <button onClick={closeModal} className="flex-1 h-10 rounded-lg border border-slate-200 text-[14px] font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">
                 {t('dashboard.common.cancel')}

@@ -64,9 +64,11 @@ async function createOrgEventWithMedia(params: CreateEventWithMediaParams): Prom
   if (params.formUrl) formData.append('FormUrl', params.formUrl)
   formData.append('StartDate', params.startDate)
   formData.append('EndDate', params.endDate)
-  if (params.files && params.files.length > 0) {
-    params.files.forEach((file) => formData.append('Files', file))
-  }
+  // Thumbnail (cover) goes first, then gallery media — media[0] = thumbnail/hero
+  const allFiles: File[] = []
+  if (params.coverImage) allFiles.push(params.coverImage)
+  if (params.files && params.files.length > 0) allFiles.push(...params.files)
+  allFiles.forEach((file) => formData.append('Files', file))
 
   const { data } = await axiosInstance.post('/api/events/with-media', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

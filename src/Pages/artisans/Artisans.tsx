@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import ArtisanCard from '@/components/atoms/ArtisanCard'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useGetRtl } from '@/lib/utils'
+import { useGetRtl, getArtisanSlug } from '@/lib/utils'
 import { useArtisans } from '@/api/artisans/useArtisans'
 
 const HERO_IMAGE =
@@ -114,7 +114,7 @@ const Artisans = () => {
                     imageUrl={artisan.coverImageUrl || ''}
                     name={name || ''}
                     onClick={() =>
-                      navigate(`/artisans/${artisan.artisanId}`, {
+                      navigate(`/artisans/${getArtisanSlug(artisan.artisanId, artisan.nameAr, artisan.nameEn)}`, {
                         state: { from: '/artisans', label: t('artisans') },
                       })
                     }

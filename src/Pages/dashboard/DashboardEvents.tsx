@@ -38,7 +38,7 @@ export default function DashboardEvents() {
     pageSize: 10,
   })
 
-  const { data: editingEvent } = useEvent(editingId ?? undefined)
+  const { data: editingEvent, isFetching: isFetchingEvent } = useEvent(editingId ?? undefined)
 
   const updateMutation = useUpdateEvent()
   const deleteMutation = useDeleteEvent()
@@ -224,6 +224,7 @@ export default function DashboardEvents() {
           setForm={setForm}
           editingId={editingId}
           isPending={updateMutation.isPending}
+          isFetchingDetail={isFetchingEvent}
           onSubmit={handleSubmit}
           onClose={handleClose}
           coverFile={coverFile}
