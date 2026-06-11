@@ -36,7 +36,7 @@ export default function Reports() {
   const deletePostMutation = useDeleteReportedPost()
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [deleteReportId, setDeleteReportId] = useState<number | null>(null)
+  const [deletePostId, setDeletePostId] = useState<number | null>(null)
 
   const reports = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) ?? []
@@ -48,17 +48,17 @@ export default function Reports() {
     dismissMutation.mutate(reportId)
   }
 
-  const handleDeletePost = (reportId: number) => {
-    setDeleteReportId(reportId)
+  const handleDeletePost = (postId: number) => {
+    setDeletePostId(postId)
     setDeleteModalOpen(true)
   }
 
   const handleDeleteConfirm = () => {
-    if (deleteReportId !== null) {
-      deletePostMutation.mutate(deleteReportId, {
+    if (deletePostId !== null) {
+      deletePostMutation.mutate(deletePostId, {
         onSuccess: () => {
           setDeleteModalOpen(false)
-          setDeleteReportId(null)
+          setDeletePostId(null)
         },
       })
     }
@@ -218,7 +218,7 @@ export default function Reports() {
                         {t('dashboard.reports.dismiss')}
                       </button>
                       <button
-                        onClick={() => handleDeletePost(report.reportId)}
+                        onClick={() => handleDeletePost(report.reportedPost.postId)}
                         disabled={deletePostMutation.isPending}
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-50 text-[13px] font-medium text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50 cursor-pointer"
                       >
@@ -255,7 +255,7 @@ export default function Reports() {
         open={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false)
-          setDeleteReportId(null)
+          setDeletePostId(null)
         }}
         onConfirm={handleDeleteConfirm}
         isPending={deletePostMutation.isPending}

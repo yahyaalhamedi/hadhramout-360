@@ -26,8 +26,8 @@ async function dismissReport(reportId: number): Promise<{ success: boolean }> {
   return data
 }
 
-async function deleteReportedPost(reportId: number): Promise<{ success: boolean }> {
-  const { data } = await axiosInstance.delete(`/api/community-post-reports/${reportId}/post`)
+async function deleteReportedPost(postId: number): Promise<{ success: boolean }> {
+  const { data } = await axiosInstance.delete(`/api/community-posts/${postId}`)
   return data
 }
 
