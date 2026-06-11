@@ -173,6 +173,14 @@ const EventDetail = () => {
                 label={t('event.sidebar.dates')}
                 value={dateRange}
               />
+
+              {address && (
+                <DetailInfoRow
+                  icon={MapPin}
+                  label={t('event.sidebar.location')}
+                  value={address}
+                />
+              )}
             </div>
 
 
