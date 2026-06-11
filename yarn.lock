@@ -5297,6 +5297,11 @@ vite-plugin-checker@^0.13.0:
     tinyglobby "^0.2.15"
     vscode-uri "^3.1.0"
 
+vite-plugin-react-click-to-component@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/vite-plugin-react-click-to-component/-/vite-plugin-react-click-to-component-4.2.2.tgz#29e122cff469c0071d119ef666f321e029e3318f"
+  integrity sha512-m9dLj4hmiInz+XbomttR3YNkAUwl0DnAMYTuZr50Q4yJf7TNd2JeytbzhKdG2A9xpBSjB7V8FkymsmiQsVbpmw==
+
 vite@^8.0.12:
   version "8.0.14"
   resolved "https://registry.yarnpkg.com/vite/-/vite-8.0.14.tgz#da5d8d1f63dbd106385cbe9c211acbc7a7a5b192"
