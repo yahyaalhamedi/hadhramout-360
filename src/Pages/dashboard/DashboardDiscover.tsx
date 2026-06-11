@@ -11,6 +11,7 @@ import {
 import type { DiscoverContentResponseDto } from '@/api/discover/useDiscoverContent.types'
 import { baseURL } from '@/api/axiosInstance'
 import RichTextEditor from '@/components/atoms/RichTextEditor'
+import DeleteConfirmModal from '@/components/atoms/DeleteConfirmModal'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -32,6 +33,8 @@ export default function DashboardDiscover() {
   const [form, setForm] = useState(emptyForm)
   const [coverImage, setCoverImage] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useDiscoverContent({
     search: search || undefined,
@@ -99,8 +102,19 @@ export default function DashboardDiscover() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm(t('dashboard.discover.delete_confirm'))) return
-    deleteMutation.mutate(id)
+    setDeleteId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteId !== null) {
+      deleteMutation.mutate(deleteId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteId(null)
+        },
+      })
+    }
   }
 
   const coverPreview = coverImage
@@ -275,6 +289,14 @@ export default function DashboardDiscover() {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeleteId(null) }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        message={t('dashboard.discover.delete_confirm')}
+      />
     </>
   )
 }

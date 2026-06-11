@@ -13,6 +13,7 @@ import type { EventResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
 import EventFormModal, { emptyEventForm } from '@/components/atoms/EventFormModal'
 import type { EventFormData } from '@/components/atoms/EventFormModal'
+import DeleteConfirmModal from '@/components/atoms/DeleteConfirmModal'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -32,6 +33,8 @@ export default function DashboardEvents() {
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useEvents({
     search: search || undefined,
@@ -101,8 +104,19 @@ export default function DashboardEvents() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm(t('dashboard.events.delete_confirm'))) return
-    deleteMutation.mutate(id)
+    setDeleteId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteId !== null) {
+      deleteMutation.mutate(deleteId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteId(null)
+        },
+      })
+    }
   }
 
   const handleClose = () => {
@@ -239,6 +253,14 @@ export default function DashboardEvents() {
           isDeletingMedia={deleteMediaMutation.isPending}
         />
       )}
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeleteId(null) }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        message={t('dashboard.events.delete_confirm')}
+      />
     </>
   )
 }

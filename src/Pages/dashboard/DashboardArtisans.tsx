@@ -10,6 +10,7 @@ import {
 } from '@/api/artisans/useArtisans'
 import type { ArtisanResponseDto } from '@/api/artisans/useArtisans.types'
 import { baseURL } from '@/api/axiosInstance'
+import DeleteConfirmModal from '@/components/atoms/DeleteConfirmModal'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -35,6 +36,8 @@ export default function DashboardArtisans() {
   const [form, setForm] = useState(emptyForm)
   const [files, setFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useArtisans({
     search: search || undefined,
@@ -120,8 +123,19 @@ export default function DashboardArtisans() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm(t('dashboard.artisans.delete_confirm'))) return
-    deleteMutation.mutate(id)
+    setDeleteId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteId !== null) {
+      deleteMutation.mutate(deleteId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteId(null)
+        },
+      })
+    }
   }
 
   return (
@@ -279,6 +293,14 @@ export default function DashboardArtisans() {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeleteId(null) }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        message={t('dashboard.artisans.delete_confirm')}
+      />
     </>
   )
 }

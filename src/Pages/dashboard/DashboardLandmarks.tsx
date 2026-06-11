@@ -11,6 +11,7 @@ import {
 import { useCategories } from '@/api/categories/useCategories'
 import type { LandmarkResponseDto } from '@/api/landmarks/useLandmarks.types'
 import { baseURL } from '@/api/axiosInstance'
+import DeleteConfirmModal from '@/components/atoms/DeleteConfirmModal'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -36,6 +37,8 @@ export default function DashboardLandmarks() {
   const [form, setForm] = useState(emptyForm)
   const [files, setFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useLandmarks({
     search: search || undefined,
@@ -121,8 +124,19 @@ export default function DashboardLandmarks() {
   }
 
   const handleDelete = (id: number) => {
-    if (!confirm(t('dashboard.landmarks.delete_confirm'))) return
-    deleteMutation.mutate(id)
+    setDeleteId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteId !== null) {
+      deleteMutation.mutate(deleteId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteId(null)
+        },
+      })
+    }
   }
 
   const toggleCategory = (id: number) => {
@@ -346,6 +360,14 @@ export default function DashboardLandmarks() {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeleteId(null) }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+        message={t('dashboard.landmarks.delete_confirm')}
+      />
     </>
   )
 }
