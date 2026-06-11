@@ -16,14 +16,15 @@ import type { EventResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
 import EventFormModal, { emptyEventForm } from '@/components/atoms/EventFormModal'
 import type { EventFormData } from '@/components/atoms/EventFormModal'
+import { useGetRtl } from '@/lib/utils'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
   return url.startsWith('http') ? url : `${baseURL}${url}`
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
+function formatDate(dateStr: string, locale: string) {
+  return new Date(dateStr).toLocaleDateString(locale === 'ar' ? 'ar-YE' : 'en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -31,7 +32,8 @@ function formatDate(dateStr: string) {
 }
 
 export default function OrgEvents() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isRtl = useGetRtl()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'active' | 'ended'>('active')
   const [showModal, setShowModal] = useState(false)
@@ -43,7 +45,7 @@ export default function OrgEvents() {
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useOrgEvents({
     pageSize: 10,
-    upcomingOnly: activeTab === 'active' ? true : undefined,
+    ...(activeTab === 'active' ? { upcomingOnly: true } : {}),
   })
 
   const { data: editingEvent, isFetching: isFetchingEvent } = useOrgEvent(editingId ?? undefined)
@@ -56,8 +58,13 @@ export default function OrgEvents() {
   const replaceMediaMutation = useReplaceOrgEventMedia()
 
   const events = useMemo(() => {
-    return data?.pages.flatMap((page) => page.items) ?? []
-  }, [data])
+    const all = data?.pages.flatMap((page) => page.items) ?? []
+    if (activeTab === 'ended') {
+      const now = new Date()
+      return all.filter((ev) => new Date(ev.endDate) < now)
+    }
+    return all
+  }, [data, activeTab])
 
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
 
@@ -116,10 +123,8 @@ export default function OrgEvents() {
         if (coverFile) {
           const existingCoverId = editingEvent?.media?.[0]?.mediaId
           if (existingCoverId) {
-            // Replace existing thumbnail (media[0])
             await replaceMediaMutation.mutateAsync({ mediaId: existingCoverId, file: coverFile })
           } else {
-            // No existing media — add as new (becomes media[0])
             await addMediaMutation.mutateAsync({ id: editingId, file: coverFile })
           }
         }
@@ -246,7 +251,7 @@ export default function OrgEvents() {
                 {ev.coverImageUrl ? (
                   <img
                     src={getImageUrl(ev.coverImageUrl)}
-                    alt={ev.titleEn ?? ''}
+                    alt={isRtl ? (ev.titleAr ?? '') : (ev.titleEn ?? '')}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
@@ -268,27 +273,33 @@ export default function OrgEvents() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white text-sm font-medium">
-                          {(ev.organizationNameEn ?? ev.organizationNameAr ?? 'O')[0]}
+                          {(isRtl ? (ev.organizationNameAr ?? ev.organizationNameEn) : (ev.organizationNameEn ?? ev.organizationNameAr) ?? 'O')[0]}
                         </div>
                       )}
                     </div>
                     <span className="text-sm text-white">
-                      {ev.organizationNameEn || ev.organizationNameAr || t('org_panel.events.organization')}
+                      {isRtl
+                        ? (ev.organizationNameAr || ev.organizationNameEn || t('org_panel.events.organization'))
+                        : (ev.organizationNameEn || ev.organizationNameAr || t('org_panel.events.organization'))}
                     </span>
                   </div>
 
                   <h2 className="mb-5 text-4xl font-bold leading-tight text-white">
-                    {ev.titleEn || ev.titleAr || t('org_panel.events.untitled')}
+                    {isRtl
+                      ? (ev.titleAr || ev.titleEn || t('org_panel.events.untitled'))
+                      : (ev.titleEn || ev.titleAr || t('org_panel.events.untitled'))}
                   </h2>
 
                   <div className="mb-4 flex items-center gap-6 text-sm text-white/90">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      <span>{ev.addressEn || ev.addressAr || t('org_panel.events.location')}</span>
+                      <span>{isRtl
+                        ? (ev.addressAr || ev.addressEn || t('org_panel.events.location'))
+                        : (ev.addressEn || ev.addressAr || t('org_panel.events.location'))}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      <span>{formatDate(ev.startDate)}</span>
+                      <span>{formatDate(ev.startDate, i18n.language)}</span>
                     </div>
                   </div>
 

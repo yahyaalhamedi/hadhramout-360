@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { MapPin, LinkIcon, Mail, Phone, Upload, Pencil } from 'lucide-react'
 import { useOrgProfile, useUpdateOrgProfile } from '@/api/organization/useOrganization'
 import { baseURL } from '@/api/axiosInstance'
+import { useGetRtl } from '@/lib/utils'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -11,6 +12,7 @@ function getImageUrl(url: string | null) {
 
 export default function OrgProfile() {
   const { t } = useTranslation()
+  const isRtl = useGetRtl()
   const { data: profile, isLoading } = useOrgProfile()
   const updateMutation = useUpdateOrgProfile()
   const [isEditing, setIsEditing] = useState(false)
@@ -328,7 +330,7 @@ export default function OrgProfile() {
             {profile?.logoUrl ? (
               <img
                 src={getImageUrl(profile.logoUrl)}
-                alt={profile.orgNameEn ?? ''}
+                alt={isRtl ? (profile.orgNameAr ?? '') : (profile.orgNameEn ?? '')}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -341,10 +343,10 @@ export default function OrgProfile() {
           {/* Info */}
           <div className="flex-1">
             <div className="space-y-3 mb-6">
-              {profile?.addressEn && (
+              {(isRtl ? profile?.addressAr : profile?.addressEn) && (
                 <div className="flex items-center gap-3 text-[14px] text-slate-600">
                   <MapPin className="h-4 w-4 text-slate-400" />
-                  <span>{profile.addressEn}</span>
+                  <span>{isRtl ? profile?.addressAr : profile?.addressEn}</span>
                 </div>
               )}
               {profile?.mapUrl && (
@@ -375,12 +377,14 @@ export default function OrgProfile() {
             </div>
 
             <h3 className="text-3xl font-bold text-slate-900 mb-4">
-              {profile?.orgNameEn || profile?.orgNameAr || 'Organization'}
+              {isRtl
+                ? (profile?.orgNameAr || profile?.orgNameEn || 'Organization')
+                : (profile?.orgNameEn || profile?.orgNameAr || 'Organization')}
             </h3>
 
-            {profile?.descriptionEn && (
+            {(isRtl ? profile?.descriptionAr : profile?.descriptionEn) && (
               <p className="text-[14px] text-slate-600 leading-relaxed max-w-2xl">
-                {profile.descriptionEn}
+                {isRtl ? profile?.descriptionAr : profile?.descriptionEn}
               </p>
             )}
           </div>
