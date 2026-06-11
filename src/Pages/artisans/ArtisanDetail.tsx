@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
   MapPin,
   Phone,
-  MessageSquare,
   Share2,
   ArrowLeft,
   ArrowRight,
@@ -258,17 +257,15 @@ const ArtisanDetail = () => {
             <div className="flex shrink-0 items-center gap-3">
               {artisan.phone && (
                 <a
-                  href={`tel:${artisan.phone}`}
-                  className="flex items-center gap-2 rounded-full border border-border bg-white px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  href={`https://wa.me/+967${artisan.phone}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full bg-[#096866] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#075553]"
                 >
                   <Phone className="h-4 w-4" />
                   {t('artisan.commission.call')}
                 </a>
               )}
-              <button className="flex items-center gap-2 rounded-full bg-[#096866] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#075553]">
-                <MessageSquare className="h-4 w-4" />
-                {t('artisan.commission.message')}
-              </button>
             </div>
           </div>
         </div>
