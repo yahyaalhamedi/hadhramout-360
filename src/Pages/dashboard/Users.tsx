@@ -5,6 +5,7 @@ import { useAdminUsers, useDeleteUser, useCreateContentManager } from '@/api/adm
 import type { AdminUser } from '@/api/admin/useAdminUsers.types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { baseURL } from '@/api/axiosInstance'
+import DeleteUserModal from '@/components/atoms/DeleteUserModal'
 
 const roleBadgeStyles: Record<string, string> = {
   Admin: 'bg-teal-700 text-white',
@@ -42,6 +43,8 @@ export default function Users() {
   const [createProfileImage, setCreateProfileImage] = useState<File | null>(null)
   const createFileInputRef = useRef<HTMLInputElement>(null)
   const [activeFilters, setActiveFilters] = useState<{ type: 'search' | 'role'; value: string }[]>([])
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteUserId, setDeleteUserId] = useState<number | null>(null)
 
   const ROLE_OPTIONS = [t('dashboard.users.all_roles'), 'Admin', 'ContentManager', 'Organization', 'User'] as const
 
@@ -94,8 +97,19 @@ export default function Users() {
   }
 
   const handleDelete = (userId: number) => {
-    if (!confirm(t('dashboard.users.delete_confirm'))) return
-    deleteMutation.mutate(userId)
+    setDeleteUserId(userId)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteUserId !== null) {
+      deleteMutation.mutate(deleteUserId, {
+        onSuccess: () => {
+          setDeleteModalOpen(false)
+          setDeleteUserId(null)
+        },
+      })
+    }
   }
 
   const handleCreate = () => {
@@ -356,6 +370,16 @@ export default function Users() {
           </div>
         </div>
       )}
+
+      <DeleteUserModal
+        open={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false)
+          setDeleteUserId(null)
+        }}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+      />
     </>
   )
 }
