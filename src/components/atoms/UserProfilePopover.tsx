@@ -1,7 +1,6 @@
 import { Heart, LayoutGrid, LogOut, Shield, Building2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useAuthContext } from '@/lib/AuthContext'
 import { Roles, hasAnyRole } from '@/lib/roles'
 import type { Role } from '@/lib/roles'
 

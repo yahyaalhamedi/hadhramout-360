@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus, Pencil, Trash2, Calendar, MapPin } from 'lucide-react'
 import {
@@ -14,9 +14,11 @@ import {
 } from '@/api/organization/useOrgEvents'
 import type { EventResponseDto } from '@/api/events/useEvents.types'
 import { baseURL } from '@/api/axiosInstance'
-import EventFormModal, { emptyEventForm } from '@/components/atoms/EventFormModal'
+import EventFormModal from '@/components/atoms/EventFormModal'
 import type { EventFormData } from '@/components/atoms/EventFormModal'
+import { emptyEventForm } from '@/components/atoms/formDefaults'
 import { useGetRtl } from '@/lib/utils'
+import { toast } from 'sonner'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -35,6 +37,7 @@ export default function OrgEvents() {
   const { t, i18n } = useTranslation()
   const isRtl = useGetRtl()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<'active' | 'ended'>('active')
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -42,6 +45,7 @@ export default function OrgEvents() {
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
+  const [pendingDeleteMediaIds, setPendingDeleteMediaIds] = useState<number[]>([])
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useOrgEvents({
     pageSize: 10,
@@ -69,45 +73,80 @@ export default function OrgEvents() {
   const totalCount = data?.pages[0]?.pagination.totalEntries ?? 0
 
   const openCreate = () => {
-    setEditingId(null)
-    setForm(emptyEventForm)
-    setCoverFile(null)
-    setCoverPreview(null)
-    setMediaFiles([])
-    setShowModal(true)
+    const params = new URLSearchParams(searchParams)
+    params.set('modal', 'create')
+    setSearchParams(params, { replace: true })
   }
 
   const openEdit = (ev: EventResponseDto) => {
-    setEditingId(ev.eventId)
-    setForm({
-      titleAr: ev.titleAr ?? '',
-      titleEn: ev.titleEn ?? '',
-      descriptionAr: '',
-      descriptionEn: '',
-      addressAr: ev.addressAr ?? '',
-      addressEn: ev.addressEn ?? '',
-      mapUrl: '',
-      formUrl: '',
-      startDate: ev.startDate ? ev.startDate.split('T')[0] : '',
-      endDate: ev.endDate ? ev.endDate.split('T')[0] : '',
-    })
-    setCoverFile(null)
-    setCoverPreview(ev.coverImageUrl ? getImageUrl(ev.coverImageUrl) : null)
-    setMediaFiles([])
-    setShowModal(true)
+    const params = new URLSearchParams(searchParams)
+    params.set('modal', 'edit')
+    params.set('id', ev.eventId.toString())
+    setSearchParams(params, { replace: true })
   }
 
-  if (editingId && editingEvent && !form.descriptionAr && editingEvent.descriptionAr) {
-    setForm((prev) => ({
-      ...prev,
-      descriptionAr: editingEvent.descriptionAr ?? '',
-      descriptionEn: editingEvent.descriptionEn ?? '',
-      addressAr: editingEvent.addressAr ?? prev.addressAr,
-      addressEn: editingEvent.addressEn ?? prev.addressEn,
-      mapUrl: editingEvent.mapUrl ?? '',
-      formUrl: editingEvent.formUrl ?? '',
-    }))
-  }
+  // Handle URL changes
+
+  const detailLoadedForId = useRef<number | null>(null)
+
+  useEffect(() => {
+    const modalParam = searchParams.get('modal')
+    const idParam = searchParams.get('id')
+
+    if (modalParam === 'create') {
+      if (!showModal && !editingId) {
+        setEditingId(null)
+        setForm(emptyEventForm)
+        setCoverFile(null)
+        setCoverPreview(null)
+        setMediaFiles([])
+        setPendingDeleteMediaIds([])
+        detailLoadedForId.current = null
+        setShowModal(true)
+      }
+    } else if (modalParam === 'edit' && idParam) {
+      const id = parseInt(idParam, 10)
+      if (!showModal || editingId !== id) {
+        setEditingId(id)
+        setShowModal(true)
+      }
+    } else {
+      if (showModal) {
+        setShowModal(false)
+        setEditingId(null)
+        setForm(emptyEventForm)
+        setCoverFile(null)
+        setCoverPreview(null)
+        setMediaFiles([])
+        setPendingDeleteMediaIds([])
+        detailLoadedForId.current = null
+      }
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (editingId && editingEvent && detailLoadedForId.current !== editingId) {
+      setForm({
+        titleAr: editingEvent.titleAr ?? '',
+        titleEn: editingEvent.titleEn ?? '',
+        descriptionAr: editingEvent.descriptionAr ?? '',
+        descriptionEn: editingEvent.descriptionEn ?? '',
+        addressAr: editingEvent.addressAr ?? '',
+        addressEn: editingEvent.addressEn ?? '',
+        mapUrl: editingEvent.mapUrl ?? '',
+        formUrl: editingEvent.formUrl ?? '',
+        startDate: editingEvent.startDate ? editingEvent.startDate.split('T')[0] : '',
+        endDate: editingEvent.endDate ? editingEvent.endDate.split('T')[0] : '',
+      })
+      setCoverFile(null)
+      const coverUrl = editingEvent.media?.[0]?.mediaUrl
+      setCoverPreview(coverUrl ? (getImageUrl(coverUrl) ?? null) : null)
+      setMediaFiles([])
+      setPendingDeleteMediaIds([])
+      detailLoadedForId.current = editingId
+    }
+  }, [editingId, editingEvent])
+
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -128,17 +167,25 @@ export default function OrgEvents() {
             await addMediaMutation.mutateAsync({ id: editingId, file: coverFile })
           }
         }
+        
+        if (pendingDeleteMediaIds.length > 0) {
+          await Promise.all(pendingDeleteMediaIds.map(id => deleteMediaMutation.mutateAsync(id)))
+        }
+
+        if (mediaFiles.length > 0) {
+          await Promise.all(mediaFiles.map(file => addMediaMutation.mutateAsync({ id: editingId, file })))
+        }
+
+        toast.success(t('dashboard.common.update_success') || 'Updated successfully!')
+        setTimeout(() => window.location.reload(), 1500)
       } else {
         await createMutation.mutateAsync({ ...form, files: mediaFiles, coverImage: coverFile ?? undefined })
+        toast.success(t('dashboard.common.create_success') || 'Created successfully!')
+        setTimeout(() => window.location.reload(), 1500)
       }
     } finally {
       setIsSubmitting(false)
-      setShowModal(false)
-      setEditingId(null)
-      setForm(emptyEventForm)
-      setCoverFile(null)
-      setCoverPreview(null)
-      setMediaFiles([])
+      handleClose()
     }
   }
 
@@ -148,12 +195,10 @@ export default function OrgEvents() {
   }
 
   const handleClose = () => {
-    setShowModal(false)
-    setEditingId(null)
-    setForm(emptyEventForm)
-    setCoverFile(null)
-    setCoverPreview(null)
-    setMediaFiles([])
+    const params = new URLSearchParams(searchParams)
+    params.delete('modal')
+    params.delete('id')
+    setSearchParams(params, { replace: true })
   }
 
   const handleCoverChange = (file: File | null) => {
@@ -173,7 +218,7 @@ export default function OrgEvents() {
   }
 
   const handleDeleteMedia = (mediaId: number) => {
-    deleteMediaMutation.mutate(mediaId)
+    setPendingDeleteMediaIds((prev) => [...prev, mediaId])
   }
 
   return (
@@ -273,7 +318,7 @@ export default function OrgEvents() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white text-sm font-medium">
-                          {(isRtl ? (ev.organizationNameAr ?? ev.organizationNameEn) : (ev.organizationNameEn ?? ev.organizationNameAr) ?? 'O')[0]}
+                          {((isRtl ? (ev.organizationNameAr ?? ev.organizationNameEn) : (ev.organizationNameEn ?? ev.organizationNameAr)) ?? 'O')[0]}
                         </div>
                       )}
                     </div>
@@ -356,6 +401,7 @@ export default function OrgEvents() {
           mediaFiles={mediaFiles}
           setMediaFiles={setMediaFiles}
           existingMedia={editingEvent?.media ?? null}
+          pendingDeleteMediaIds={pendingDeleteMediaIds}
           onAddMedia={handleAddMedia}
           onDeleteMedia={handleDeleteMedia}
           isAddingMedia={addMediaMutation.isPending}

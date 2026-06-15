@@ -82,6 +82,15 @@ async function deleteLandmarkMedia(mediaId: number): Promise<{ success: boolean 
   return data
 }
 
+async function replaceLandmarkMedia(mediaId: number, file: File): Promise<{ mediaId: number; mediaUrl: string }> {
+  const formData = new FormData()
+  formData.append('File', file)
+  const { data } = await axiosInstance.put(`/api/landmarks/media/${mediaId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
 // ── Hooks ─────────────────────────────────────────────────────────
 
 export function useLandmarks({ search, categoryId, pageSize }: UseLandmarksParams) {
@@ -149,6 +158,18 @@ export function useDeleteLandmarkMedia() {
     mutationFn: deleteLandmarkMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['landmarks'] })
+      queryClient.invalidateQueries({ queryKey: ['landmark'] })
+    },
+  })
+}
+
+export function useReplaceLandmarkMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ mediaId, file }: { mediaId: number; file: File }) => replaceLandmarkMedia(mediaId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['landmarks'] })
+      queryClient.invalidateQueries({ queryKey: ['landmark'] })
     },
   })
 }

@@ -215,8 +215,8 @@ const Landmarks = () => {
                   <SharedCard
                     key={landmark.landmarkId}
                     imageUrl={landmark.coverMediaUrl || ''}
-                    location={location}
-                    title={title}
+                    location={location ?? ''}
+                    title={title ?? ''}
                     isFavorite={landmark.isFavorite}
                     onFavoriteClick={() => toggleFavorite(landmark.landmarkId)}
                     onClick={() =>

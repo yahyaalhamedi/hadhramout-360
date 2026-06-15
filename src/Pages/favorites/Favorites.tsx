@@ -51,7 +51,7 @@ const Favorites = () => {
                 {fav.coverMediaUrl ? (
                   <img
                     src={`${baseURL}${fav.coverMediaUrl}`}
-                    alt={isRtl ? fav.titleAr : fav.titleEn}
+                    alt={(isRtl ? fav.titleAr : fav.titleEn) ?? undefined}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (

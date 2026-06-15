@@ -107,6 +107,15 @@ async function deleteEventMedia(mediaId: number): Promise<{ success: boolean }> 
   return data
 }
 
+async function replaceEventMedia(mediaId: number, file: File): Promise<{ mediaId: number; mediaUrl: string }> {
+  const formData = new FormData()
+  formData.append('File', file)
+  const { data } = await axiosInstance.put(`/api/events/media/${mediaId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
 // ── Hooks ─────────────────────────────────────────────────────────
 
 export function useEvents({ search, fromDate, toDate, upcomingOnly, pageSize }: UseEventsParams) {
@@ -184,6 +193,18 @@ export function useDeleteEventMedia() {
     mutationFn: deleteEventMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['event'] })
+    },
+  })
+}
+
+export function useReplaceEventMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ mediaId, file }: { mediaId: number; file: File }) => replaceEventMedia(mediaId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['event'] })
     },
   })
 }

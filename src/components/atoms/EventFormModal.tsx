@@ -18,18 +18,7 @@ export interface EventFormData {
   endDate: string
 }
 
-export const emptyEventForm: EventFormData = {
-  titleAr: '',
-  titleEn: '',
-  descriptionAr: '',
-  descriptionEn: '',
-  addressAr: '',
-  addressEn: '',
-  mapUrl: '',
-  formUrl: '',
-  startDate: '',
-  endDate: '',
-}
+
 
 interface EventFormModalProps {
   form: EventFormData
@@ -39,7 +28,7 @@ interface EventFormModalProps {
   onSubmit: () => void
   onClose: () => void
   coverFile?: File | null
-  setCoverFile?: React.Dispatch<React.SetStateAction<File | null>>
+  setCoverFile?: (file: File | null) => void
   coverPreview?: string | null
   mediaFiles?: File[]
   setMediaFiles?: React.Dispatch<React.SetStateAction<File[]>>
@@ -49,6 +38,7 @@ interface EventFormModalProps {
   isAddingMedia?: boolean
   isDeletingMedia?: boolean
   isFetchingDetail?: boolean
+  pendingDeleteMediaIds?: number[]
 }
 
 function getMediaUrl(url: string | null) {
@@ -63,16 +53,17 @@ export default function EventFormModal({
   isPending,
   onSubmit,
   onClose,
+  coverFile,
   setCoverFile,
   coverPreview,
   mediaFiles,
   setMediaFiles,
   existingMedia,
-  onAddMedia,
   onDeleteMedia,
   isAddingMedia,
   isDeletingMedia,
   isFetchingDetail,
+  pendingDeleteMediaIds,
 }: EventFormModalProps) {
   const { t } = useTranslation()
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -87,11 +78,7 @@ export default function EventFormModal({
 
   const handleMediaAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
-    if (editingId) {
-      files.forEach((file) => onAddMedia?.(file))
-    } else {
-      setMediaFiles?.((prev) => [...prev, ...files])
-    }
+    setMediaFiles?.((prev) => [...prev, ...files])
     if (mediaInputRef.current) mediaInputRef.current.value = ''
   }
 
@@ -138,10 +125,17 @@ export default function EventFormModal({
           <button
             type="button"
             onClick={() => coverInputRef.current?.click()}
-            className="w-full h-40 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer"
+            className={`w-full h-40 border-2 border-dashed ${coverFile ? 'border-green-500 bg-green-50/50' : 'border-slate-300'} rounded-xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer relative overflow-hidden`}
           >
             {coverPreview ? (
-              <img src={coverPreview} alt="Preview" className="h-32 rounded-lg object-cover" />
+              <>
+                <img src={coverPreview} alt="Preview" className="h-full w-full object-cover rounded-lg" />
+                {coverFile && (
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-sm">
+                    New Cover
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <CloudUpload className="h-10 w-10 text-slate-400" />
@@ -321,8 +315,8 @@ export default function EventFormModal({
             <div className="flex items-center gap-2 mb-1">
               <ImageIcon className="h-4 w-4 text-[#0a5c66]" />
               <span className="text-[14px] font-semibold text-slate-700">{t('dashboard.event_form.media_gallery')}</span>
-              {editingId && existingMedia && existingMedia.length > 0 && (
-                <span className="text-[12px] text-slate-400">({existingMedia.length})</span>
+              {editingId && existingMedia && existingMedia.length > 1 && (
+                <span className="text-[12px] text-slate-400">({existingMedia.length - 1})</span>
               )}
               {!editingId && mediaFiles && mediaFiles.length > 0 && (
                 <span className="text-[12px] text-slate-400">({mediaFiles.length})</span>
@@ -340,38 +334,52 @@ export default function EventFormModal({
             className="hidden"
           />
 
-          {/* Edit mode: show existing media from server */}
-          {editingId && existingMedia && existingMedia.length > 0 && (
+          {/* Edit mode: show existing media from server (skip index 0 which is the cover) */}
+          {editingId && existingMedia && existingMedia.length > 1 && (
             <div className="grid grid-cols-3 gap-3">
-              {existingMedia.map((media) => (
-                <div key={media.mediaId} className="group relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white">
+              {existingMedia.slice(1).map((media) => {
+                const isPendingDelete = pendingDeleteMediaIds?.includes(media.mediaId)
+                return (
+                <div key={media.mediaId} className={`group relative aspect-square rounded-xl overflow-hidden border ${isPendingDelete ? 'border-red-500 opacity-50' : 'border-slate-200'} bg-white`}>
                   <img
                     src={getMediaUrl(media.mediaUrl)}
                     alt=""
                     className="w-full h-full object-cover"
                   />
-                  <button
-                    onClick={() => onDeleteMedia(media.mediaId)}
-                    disabled={isDeletingMedia}
-                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 cursor-pointer disabled:opacity-50"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  {!isPendingDelete && (
+                    <button
+                      onClick={() => onDeleteMedia?.(media.mediaId)}
+                      disabled={isDeletingMedia}
+                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 cursor-pointer disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  {isPendingDelete && (
+                    <div className="absolute inset-0 bg-red-500/10 flex flex-col items-center justify-center">
+                      <Trash2 className="h-6 w-6 text-red-500 mb-1" />
+                      <span className="text-[10px] font-bold text-red-500 uppercase">Pending Delete</span>
+                    </div>
+                  )}
                 </div>
-              ))}
+              )})}
             </div>
           )}
 
-          {/* Create mode: show staged files */}
-          {!editingId && mediaFiles && mediaFiles.length > 0 && (
-            <div className="grid grid-cols-3 gap-3">
+          {/* Show staged files (Create & Edit mode new additions) */}
+          {mediaFiles && mediaFiles.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mt-3">
               {mediaFiles.map((file, index) => (
-                <div key={index} className="group relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white">
+                <div key={index} className="group relative aspect-square rounded-xl overflow-hidden border-2 border-green-500 bg-white">
                   <img
                     src={URL.createObjectURL(file)}
                     alt=""
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 border-2 border-green-500 rounded-xl pointer-events-none" />
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-sm">
+                    New
+                  </div>
                   <button
                     onClick={() => handleRemoveStagedFile(index)}
                     className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 cursor-pointer"

@@ -81,6 +81,15 @@ async function deleteArtisanMedia(mediaId: number): Promise<{ success: boolean }
   return data
 }
 
+async function replaceArtisanMedia(mediaId: number, file: File): Promise<{ mediaId: number; mediaUrl: string }> {
+  const formData = new FormData()
+  formData.append('File', file)
+  const { data } = await axiosInstance.put(`/api/artisans/media/${mediaId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.data
+}
+
 // ── Hooks ─────────────────────────────────────────────────────────
 
 export function useArtisans({ search, pageSize }: UseArtisansParams) {
@@ -148,6 +157,18 @@ export function useDeleteArtisanMedia() {
     mutationFn: deleteArtisanMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artisans'] })
+      queryClient.invalidateQueries({ queryKey: ['artisan'] })
+    },
+  })
+}
+
+export function useReplaceArtisanMedia() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ mediaId, file }: { mediaId: number; file: File }) => replaceArtisanMedia(mediaId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artisans'] })
+      queryClient.invalidateQueries({ queryKey: ['artisan'] })
     },
   })
 }

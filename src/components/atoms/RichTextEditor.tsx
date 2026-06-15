@@ -22,7 +22,7 @@ const formats = ['header', 'bold', 'italic', 'underline', 'list', 'bullet', 'blo
 
 export default function RichTextEditor({ value, onChange, placeholder, dir }: RichTextEditorProps) {
   return (
-    <div className="rich-text-editor">
+    <div className="rich-text-editor" dir={dir}>
       <ReactQuill
         theme="snow"
         value={value}
@@ -30,7 +30,6 @@ export default function RichTextEditor({ value, onChange, placeholder, dir }: Ri
         modules={modules}
         formats={formats}
         placeholder={placeholder}
-        dir={dir}
       />
     </div>
   )
