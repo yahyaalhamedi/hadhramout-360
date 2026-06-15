@@ -114,38 +114,68 @@ export default function EventFormModal({
         ) : (
         <>
         {/* Thumbnail */}
-        <div className="mb-6">
-          <input
-            ref={coverInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleCoverChange}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => coverInputRef.current?.click()}
-            className={`w-full h-40 border-2 border-dashed ${coverFile ? 'border-green-500 bg-green-50/50' : 'border-slate-300'} rounded-xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer relative overflow-hidden`}
-          >
-            {coverPreview ? (
-              <>
-                <img src={coverPreview} alt="Preview" className="h-full w-full object-cover rounded-lg" />
-                {coverFile && (
-                  <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-sm">
-                    New Cover
-                  </div>
+        {(() => {
+          const existingCoverId = existingMedia?.[0]?.mediaId || (existingMedia?.[0] as any)?.id
+          const isExistingCoverPendingDelete = existingCoverId && pendingDeleteMediaIds?.includes(existingCoverId)
+          return (
+            <div className="mb-6 relative">
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleCoverChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                className={`w-full h-40 border-2 border-dashed ${coverFile ? 'border-green-500 bg-green-50/50' : isExistingCoverPendingDelete ? 'border-red-500 opacity-50' : 'border-slate-300'} rounded-xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer relative overflow-hidden`}
+              >
+                {coverPreview ? (
+                  <>
+                    <img src={coverPreview} alt="Preview" className="h-full w-full object-cover rounded-lg" />
+                    {coverFile && (
+                      <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-sm">
+                        New Cover
+                      </div>
+                    )}
+                    {isExistingCoverPendingDelete && !coverFile && (
+                      <div className="absolute inset-0 bg-red-500/10 flex flex-col items-center justify-center">
+                        <Trash2 className="h-6 w-6 text-red-500 mb-1" />
+                        <span className="text-[10px] font-bold text-red-500 uppercase">Pending Delete</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="h-10 w-10 text-slate-400" />
+                    <span className="text-[14px] font-medium">{t('dashboard.event_form.upload_image')}</span>
+                    <span className="text-[12px] text-slate-400">{t('dashboard.event_form.image_hint')}</span>
+                    <span className="text-[11px] text-[#0a5c66] max-w-[80%] text-center mt-1">{t('dashboard.event_form.cover_hint2')}</span>
+                  </>
                 )}
-              </>
-            ) : (
-              <>
-                <CloudUpload className="h-10 w-10 text-slate-400" />
-                <span className="text-[14px] font-medium">{t('dashboard.event_form.upload_image')}</span>
-                <span className="text-[12px] text-slate-400">{t('dashboard.event_form.image_hint')}</span>
-                <span className="text-[11px] text-[#0a5c66] max-w-[80%] text-center mt-1">{t('dashboard.event_form.cover_hint2')}</span>
-              </>
-            )}
-          </button>
-        </div>
+              </button>
+              {/* Delete Button for Cover */}
+              {(coverPreview || coverFile) && !isExistingCoverPendingDelete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (coverFile) {
+                      setCoverFile?.(null)
+                    } else if (existingCoverId) {
+                      onDeleteMedia?.(existingCoverId)
+                    }
+                  }}
+                  disabled={isDeletingMedia}
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 text-white hover:bg-red-500 transition-colors cursor-pointer disabled:opacity-50 z-10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          )
+        })()}
 
         <div className="space-y-5">
           {/* Language badges */}

@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Search, Trash2, Pencil, Plus, Loader2, X } from 'lucide-react'
 import { baseURL } from '@/api/axiosInstance'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 import DeleteConfirmModal from './DeleteConfirmModal'
 
 function getImageUrl(url: string | null) {
@@ -104,6 +105,7 @@ export default function DashboardCrudPage<TListItem, TDetail, TForm>({
   showCreateButton = true,
 }: DashboardCrudPageProps<TListItem, TDetail, TForm>) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -235,17 +237,17 @@ export default function DashboardCrudPage<TListItem, TDetail, TForm>({
           if (promises.length > 0) {
             await Promise.all(promises)
           }
+          await queryClient.invalidateQueries()
           toast.success(t('dashboard.common.update_success') || 'Updated successfully!')
           closeModal()
-          setTimeout(() => window.location.reload(), 1500)
         },
       })
     } else {
       createResult.mutate(buildCreatePayload(form, coverFile, mediaFiles), {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries()
           toast.success(t('dashboard.common.create_success') || 'Created successfully!')
           closeModal()
-          setTimeout(() => window.location.reload(), 1500)
         },
       })
     }
@@ -259,7 +261,8 @@ export default function DashboardCrudPage<TListItem, TDetail, TForm>({
   const handleDeleteConfirm = () => {
     if (deleteId !== null) {
       deleteResult.mutate(deleteId, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries()
           setDeleteModalOpen(false)
           setDeleteId(null)
         },

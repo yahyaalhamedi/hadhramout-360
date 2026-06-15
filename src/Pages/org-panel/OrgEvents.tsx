@@ -19,6 +19,7 @@ import type { EventFormData } from '@/components/atoms/EventFormModal'
 import { emptyEventForm } from '@/components/atoms/formDefaults'
 import { useGetRtl } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 
 function getImageUrl(url: string | null) {
   if (!url) return undefined
@@ -46,6 +47,8 @@ export default function OrgEvents() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [pendingDeleteMediaIds, setPendingDeleteMediaIds] = useState<number[]>([])
+  
+  const queryClient = useQueryClient()
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useOrgEvents({
     pageSize: 10,
@@ -176,12 +179,12 @@ export default function OrgEvents() {
           await Promise.all(mediaFiles.map(file => addMediaMutation.mutateAsync({ id: editingId, file })))
         }
 
+        await queryClient.invalidateQueries()
         toast.success(t('dashboard.common.update_success') || 'Updated successfully!')
-        setTimeout(() => window.location.reload(), 1500)
       } else {
         await createMutation.mutateAsync({ ...form, files: mediaFiles, coverImage: coverFile ?? undefined })
+        await queryClient.invalidateQueries()
         toast.success(t('dashboard.common.create_success') || 'Created successfully!')
-        setTimeout(() => window.location.reload(), 1500)
       }
     } finally {
       setIsSubmitting(false)
