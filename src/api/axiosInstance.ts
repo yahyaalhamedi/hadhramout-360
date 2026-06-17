@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { clearAuthCookies } from '@/lib/auth'
 
-// Full backend origin — used for API requests and <img> src attributes.
-// In production builds, it can be overridden by VITE_API_BASE_URL.
-export const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://had360.runasp.net'
-const API_BASE_URL = baseURL
+// Full backend origin — used only for <img> src attributes to load images directly.
+export const baseURL = 'https://had360.runasp.net'
+
+// For API calls, use VITE_API_BASE_URL to allow proxying on Netlify/Vercel and bypass CORS.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || baseURL
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
