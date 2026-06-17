@@ -7,9 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useGetRtl, getArtisanSlug } from '@/lib/utils'
 import { useArtisans } from '@/api/artisans/useArtisans'
+import HERO_IMAGE from '@/assets/images/artisans.jpg'
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1600&q=80'
 
 const Artisans = () => {
   const { t } = useTranslation()
@@ -45,22 +44,6 @@ const Artisans = () => {
             alt="Hadhramout Artisans"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
-        </div>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
-          <h1
-            className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "'Thmanyah', serif", direction: 'rtl' }}
-          >
-            {t('hero.artisans.ar')}
-          </h1>
-          <p
-            className="text-3xl font-semibold md:text-4xl lg:text-5xl"
-            style={{ color: '#cea46c', fontFamily: 'Georgia, serif' }}
-          >
-            {t('hero.artisans.en')}
-          </p>
         </div>
 
         {/* Search bar */}

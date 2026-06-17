@@ -9,10 +9,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import Artisans from '@/assets/images/artisans.png'
-import Community from '@/assets/images/community.png'
-import Events from '@/assets/images/events.png'
-import Landmarks from '@/assets/images/landmarks.png'
+import Artisans from '@/assets/images/artisans.jpg'
+import Community from '@/assets/images/community.jpg'
+import Events from '@/assets/images/events.jpg'
+import Landmarks from '@/assets/images/landmarks.jpg'
+import Discovery from '@/assets/images/discovery.jpg'
 import { useGetRtl } from '@/lib/utils'
 
 const slides = [
@@ -20,6 +21,7 @@ const slides = [
   { src: Artisans, alt: 'Artisans' },
   { src: Community, alt: 'Community' },
   { src: Events, alt: 'Events' },
+  { src: Discovery, alt: 'discovery' },
 ] as const
 
 export function CarouselPlugin() {

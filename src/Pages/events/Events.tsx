@@ -8,9 +8,7 @@ import { EventCard } from '@/components/atoms/EventCard'
 import { useEvents } from '@/api/events/useEvents'
 import { baseURL } from '@/api/axiosInstance'
 import InfiniteScroll from 'react-infinite-scroller'
-
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1600&q=80'
+import HERO_IMAGE from '@/assets/images/events.jpg'
 
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80'
@@ -39,30 +37,13 @@ const Events = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <div className="relative mx-4 mt-4 h-[340px] md:h-[380px]">
+      <div className="relative mx-4 mt-4 h-[420px] md:h-[480px]">
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
           <img
             src={HERO_IMAGE}
             alt="Hadhramout Events"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
-        </div>
-
-        {/* Hero text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
-          <h1
-            className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "'Thmanyah', serif", direction: 'rtl' }}
-          >
-            {t('hero.events.ar')}
-          </h1>
-          <p
-            className="text-3xl font-semibold md:text-4xl lg:text-5xl"
-            style={{ color: '#cea46c', fontFamily: 'Georgia, serif' }}
-          >
-            {t('hero.events.en')}
-          </p>
         </div>
 
         {/* Search bar */}

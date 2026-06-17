@@ -124,7 +124,7 @@ const EventDetail = () => {
       <div className="mx-auto max-w-6xl px-4 py-12 md:px-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Left — article */}
-          <article className="lg:col-span-2 space-y-6">
+          <article className="lg:col-span-2 space-y-6 min-w-0">
             {/* Author */}
             {orgName && (
               <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ const EventDetail = () => {
 
             {description ? (
               <div
-                className="prose prose-slate max-w-none leading-relaxed text-muted-foreground prose-headings:text-foreground prose-p:my-3 prose-ul:my-3 prose-ol:my-3 prose-li:my-1"
+                className="prose prose-slate max-w-none w-full leading-relaxed text-muted-foreground prose-headings:text-foreground prose-p:my-3 prose-ul:my-3 prose-ol:my-3 prose-li:my-1"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
             ) : (

@@ -205,6 +205,25 @@ body {
 }
 
 /* ── Rendered Rich Text Content ─────────────────────────────── */
+.prose {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.prose * {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.prose img,
+.prose video,
+.prose iframe {
+  max-width: 100%;
+  height: auto;
+}
+
 .prose h2 {
   font-size: 1.5rem;
   font-weight: 700;

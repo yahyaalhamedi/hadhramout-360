@@ -8,9 +8,8 @@ import { useNavigate } from 'react-router-dom'
 import { useGetRtl } from '@/lib/utils'
 import { useDiscoverContent } from '@/api/discover/useDiscoverContent'
 import { cn } from '@/lib/utils'
+import HERO_IMAGE from '@/assets/images/discovery.jpg'
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1600&q=80'
 
 // ── Custom Throne of Bilqis Icon (Commented out for later use) ─────
 // const ThroneIcon = (props: React.ComponentProps<'svg'>) => (
@@ -149,22 +148,6 @@ const Discover = () => {
             alt="Hadhramout Discover"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
-        </div>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
-          <h1
-            className="text-4xl font-bold text-white md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "'Thmanyah', serif", direction: 'rtl' }}
-          >
-            {t('hero.discover.ar')}
-          </h1>
-          <p
-            className="text-3xl font-semibold md:text-4xl lg:text-5xl"
-            style={{ color: '#cea46c', fontFamily: 'Georgia, serif' }}
-          >
-            {t('hero.discover.en')}
-          </p>
         </div>
 
         {/* Search bar */}
