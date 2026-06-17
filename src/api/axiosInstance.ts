@@ -1,11 +1,13 @@
 import axios from 'axios'
 import { clearAuthCookies } from '@/lib/auth'
 
-// Full backend origin — used only for <img> src attributes (no CORS issue).
-export const baseURL = 'https://had360.runasp.net'
+// Full backend origin — used for API requests and <img> src attributes.
+// In production builds, it can be overridden by VITE_API_BASE_URL.
+export const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://had360.runasp.net'
+const API_BASE_URL = baseURL
 
 export const axiosInstance = axios.create({
-  baseURL: baseURL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
