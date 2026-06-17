@@ -4,8 +4,9 @@ import { clearAuthCookies } from '@/lib/auth'
 // Full backend origin — used only for <img> src attributes to load images directly.
 export const baseURL = 'https://had360.runasp.net'
 
-// For API calls, use VITE_API_BASE_URL to allow proxying on Netlify/Vercel and bypass CORS.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || baseURL
+// For API calls, default to '' so that requests are relative (e.g., /api/...)
+// This automatically uses the Vite proxy locally and the Netlify _redirects proxy in production!
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
